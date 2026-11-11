@@ -1,0 +1,21 @@
+{
+  "Name": "Media (MPRIS)",
+  "Author": "Miwoli",
+  "Version": "0.2.0.0",
+  "Icon": "images/pluginIcon",
+  "Category": "Media",
+  "CategoryIcon": "images/pluginCategory",
+  "OS": [{ "Platform": "linux" }],
+  "CodePathLin": "bin/plugin.cjs",
+  "PropertyInspectorPath": "pi/inspector.html",
+  "Actions": [
+    {
+      "UUID": "com.miwoli.media.player",
+      "Name": "Player",
+      "Tooltip": "Now playing (Spotify, browser…): press = pause/resume, double press = switch player, hold = next track",
+      "Icon": "images/action",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyDefault", "ShowTitle": false }]
+    }
+  ]
+}

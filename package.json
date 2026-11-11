@@ -1,0 +1,35 @@
+{
+  "name": "opendeck-hub",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenDeck plugins for Linux and a first-generation Stream Deck (5x3)",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "plugins/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "watch": "echo \"use: npm run watch -w plugins/<name>\"",
+    "install-plugin": "npm run install-plugin --workspaces --if-present",
+    "pack": "npm run pack --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "preview": "npm run preview -w packages/core",
+    "smoke": "npm run smoke --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
+    "esbuild": "^0.24.0",
+    "sharp": "^0.33.5",
+    "typescript": "^5.9.3"
+  },
+  "allowScripts": {
+    "esbuild@0.24.2": true,
+    "sharp@0.33.5": true
+  }
+}

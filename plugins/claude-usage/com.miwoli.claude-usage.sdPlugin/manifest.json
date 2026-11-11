@@ -1,0 +1,44 @@
+{
+  "Name": "Claude Usage",
+  "Author": "Miwoli",
+  "Version": "0.2.0.0",
+  "Icon": "images/pluginIcon",
+  "Category": "Claude Usage",
+  "CategoryIcon": "images/pluginCategory",
+  "OS": [
+    { "Platform": "linux" }
+  ],
+  "CodePathLin": "bin/plugin.cjs",
+  "Actions": [
+    {
+      "UUID": "com.miwoli.claude-usage.session",
+      "Name": "Claude Session (5h)",
+      "Tooltip": "Usage of the Claude.ai account session limit (5h)",
+      "Icon": "images/actionSession",
+      "Controllers": ["Keypad"],
+      "PropertyInspectorPath": "pi/global.html",
+      "States": [
+        {
+          "Image": "images/keyDefaultSession",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ]
+    },
+    {
+      "UUID": "com.miwoli.claude-usage.weekly",
+      "Name": "Claude Week (7d)",
+      "Tooltip": "Usage of the Claude.ai account weekly limit (7 days)",
+      "Icon": "images/actionWeekly",
+      "Controllers": ["Keypad"],
+      "PropertyInspectorPath": "pi/global.html",
+      "States": [
+        {
+          "Image": "images/keyDefaultWeekly",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ]
+    }
+  ]
+}

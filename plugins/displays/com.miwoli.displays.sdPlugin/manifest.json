@@ -1,0 +1,21 @@
+{
+  "Name": "Displays (KDE)",
+  "Author": "Miwoli",
+  "Version": "0.1.0.0",
+  "Icon": "images/pluginIcon",
+  "Category": "Displays",
+  "CategoryIcon": "images/pluginCategory",
+  "OS": [{ "Platform": "linux" }],
+  "CodePathLin": "bin/plugin.cjs",
+  "PropertyInspectorPath": "pi/inspector.html",
+  "Actions": [
+    {
+      "UUID": "com.miwoli.displays.layout",
+      "Name": "Screen layout",
+      "Tooltip": "Switches to a single screen or an extended desktop (kscreen-doctor). The layout is chosen in the key settings.",
+      "Icon": "images/action",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyDefault", "ShowTitle": false }]
+    }
+  ]
+}

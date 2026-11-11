@@ -1,0 +1,45 @@
+{
+  "Name": "Games",
+  "Author": "Miwoli",
+  "Version": "0.1.0.0",
+  "Icon": "images/pluginIcon",
+  "Category": "Games",
+  "CategoryIcon": "images/pluginCategory",
+  "OS": [{ "Platform": "linux" }],
+  "CodePathLin": "bin/plugin.cjs",
+  "PropertyInspectorPath": "pi/inspector.html",
+  "Actions": [
+    {
+      "UUID": "com.miwoli.games.launcher",
+      "Name": "Library (Steam / Lutris)",
+      "Tooltip": "Opens the Steam or Lutris library (chosen in the key settings)",
+      "Icon": "images/actionLauncher",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyLauncher", "ShowTitle": false }]
+    },
+    {
+      "UUID": "com.miwoli.games.recent",
+      "Name": "Recently played",
+      "Tooltip": "A game from the recently played list (Steam + Lutris), slot 1-5; pressing launches it",
+      "Icon": "images/actionRecent",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyRecent", "ShowTitle": false }]
+    },
+    {
+      "UUID": "com.miwoli.games.gamemode",
+      "Name": "Game mode",
+      "Tooltip": "Toggle with state (action not defined yet)",
+      "Icon": "images/actionGamemode",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyGamemode", "ShowTitle": false }]
+    },
+    {
+      "UUID": "com.miwoli.games.closegame",
+      "Name": "Close game",
+      "Tooltip": "Closes the running game (Steam/Lutris): hold for 1 s, release, then press again within 3 s",
+      "Icon": "images/actionClose",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyClose", "ShowTitle": false }]
+    }
+  ]
+}

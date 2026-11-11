@@ -1,0 +1,21 @@
+{
+  "name": "com.miwoli.ha-map",
+  "version": "0.2.0",
+  "private": true,
+  "description": "OpenDeck plugin: an OSM map of the people in Home Assistant spread over a 5x3 deck, plus keys with each person's distance from home.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-icons.ts && node ../../scripts/build-plugin.mjs",
+    "watch": "node ../../scripts/build-plugin.mjs --watch",
+    "install-plugin": "npm run build && node ../../scripts/install-plugin.mjs",
+    "pack": "npm run build && node ../../scripts/pack-plugin.mjs",
+    "typecheck": "tsc --noEmit",
+    "smoke": "node ../../scripts/smoke-plugin.mjs",
+    "test": "node ../../scripts/build-plugin.mjs && node test/e2e.mjs && node ../../scripts/smoke-plugin.mjs"
+  },
+  "dependencies": {
+    "@miwoli/deck-core": "*",
+    "ws": "^8.18.0"
+  }
+}

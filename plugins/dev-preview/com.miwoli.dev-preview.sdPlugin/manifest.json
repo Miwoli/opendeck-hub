@@ -1,0 +1,20 @@
+{
+  "Name": "Nocturne Preview (dev)",
+  "Author": "Miwoli",
+  "Version": "0.1.0.0",
+  "Icon": "images/pluginIcon",
+  "Category": "Nocturne Preview",
+  "CategoryIcon": "images/pluginCategory",
+  "OS": [{ "Platform": "linux" }],
+  "CodePathLin": "bin/plugin.cjs",
+  "Actions": [
+    {
+      "UUID": "com.miwoli.dev-preview.gallery",
+      "Name": "Tile preview",
+      "Tooltip": "Place on all 15 keys: shows a gallery page; pressing cycles Main / Games / States",
+      "Icon": "images/action",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyDefault", "ShowTitle": false }]
+    }
+  ]
+}

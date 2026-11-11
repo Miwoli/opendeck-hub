@@ -1,0 +1,13 @@
+node_modules/
+dist/
+*.streamDeckPlugin
+*.log
+.env
+# build output inside .sdPlugin (generated)
+plugins/*/*.sdPlugin/bin/
+# property inspector copied from pi/ at build time
+plugins/*/*.sdPlugin/pi/
+
+# private, local-only material (personal setup, plans, design drafts, notes)
+docs/private/
+CLAUDE.local.md

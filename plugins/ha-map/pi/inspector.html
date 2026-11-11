@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>HA Map - settings</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #16171a;
+    --panel: #1d1e22;
+    --border: #2c2e33;
+    --text-main: #f5f5f0;
+    --text-muted: #8d8f96;
+    --accent: #3b82f6;
+    --danger: #ff5a5f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 16px;
+    background: var(--bg);
+    color: var(--text-main);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 13px;
+  }
+  h1 { font-size: 14px; margin: 0 0 12px; }
+  h2 { font-size: 12px; margin: 18px 0 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  p.hint { color: var(--text-muted); margin: 0 0 12px; line-height: 1.5; font-size: 12px; }
+  .field { margin-bottom: 12px; }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+  }
+  .row { display: flex; gap: 8px; }
+  input, select {
+    flex: 1;
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); }
+  button {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .status { margin-top: 12px; font-size: 12px; color: var(--text-muted); min-height: 16px; }
+  .status.ok { color: #3ddc84; }
+  .status.err { color: var(--danger); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+  <h1>HA Map</h1>
+
+  <section id="personSection" hidden>
+    <h2>This key: person</h2>
+    <div class="field">
+      <label for="entityId">Person (person.* entity)</label>
+      <div class="row"><select id="entityId"></select><button id="refreshPersons" type="button">Refresh</button></div>
+    </div>
+    <div class="field">
+      <label for="display">Under the name</label>
+      <select id="display">
+        <option value="distance">Distance from home</option>
+        <option value="place">Place (zone)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="showAvatar">Avatar</label>
+      <select id="showAvatar">
+        <option value="yes">Show the person's picture from Home Assistant</option>
+        <option value="no">Initial only</option>
+      </select>
+    </div>
+    <p id="personStatus" class="hint"></p>
+  </section>
+
+  <section>
+    <h2>Home Assistant and map (shared by all keys)</h2>
+    <p class="hint">
+      Create a long-lived token in Home Assistant: user profile &rarr; Security &rarr;
+      Long-lived access tokens. It is stored in the plugin settings file
+      (plain text) - use an account / token with the fewest possible permissions.
+    </p>
+    <div class="field">
+      <label for="haUrl">Home Assistant URL</label>
+      <input id="haUrl" type="text" placeholder="http://homeassistant.local:8123" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="token">Access token</label>
+      <div class="row">
+        <input id="token" type="password" autocomplete="off" />
+        <button id="toggleToken" type="button" style="flex:none">Show</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="tileUrl">Map tile URL template</label>
+      <input id="tileUrl" type="text" placeholder="https://tile.openstreetmap.org/{z}/{x}/{y}.png" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="userAgent">User-Agent of tile requests</label>
+      <input id="userAgent" type="text" placeholder="OpenDeck-HAMap/0.1 (contact: ...)" autocomplete="off" />
+    </div>
+    <div class="row">
+      <div class="field" style="flex:1">
+        <label for="refreshSeconds">Map refresh interval (s)</label>
+        <input id="refreshSeconds" type="number" min="5" max="600" step="1" value="20" />
+      </div>
+      <div class="field" style="flex:1">
+        <label for="maxZoom">Max zoom (8-18)</label>
+        <input id="maxZoom" type="number" min="8" max="18" step="1" value="16" />
+      </div>
+    </div>
+    <p class="hint">
+      Map: &copy; OpenStreetMap contributors. Tiles are downloaded
+      from the OSM servers according to their policy (cache, own User-Agent); change the URL template
+      if you want to use another provider or your own tile server.
+    </p>
+    <button id="save" class="primary" type="button">Save settings</button>
+    <div id="status" class="status"></div>
+  </section>
+
+<script>
+  var websocket = null;
+  var piUUID = null;
+  var actionUuid = null;
+  var personsRequested = false;
+  var personRetries = 0;
+  var persons = [];
+  var personsKey = '';
+  var currentGlobal = {};
+  var currentPerson = { entityId: '', display: 'distance', showAvatar: true };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var statusEl = $('status');
+
+  function setStatus(text, kind) {
+    statusEl.textContent = text;
+    statusEl.className = 'status' + (kind ? ' ' + kind : '');
+  }
+
+  function send(message) {
+    if (!websocket || websocket.readyState !== WebSocket.OPEN) return false;
+    websocket.send(JSON.stringify(message));
+    return true;
+  }
+
+  function applyGlobal(settings) {
+    currentGlobal = settings || {};
+    $('haUrl').value = currentGlobal.haUrl || '';
+    $('token').value = currentGlobal.token || '';
+    $('tileUrl').value = currentGlobal.tileUrl || '';
+    $('userAgent').value = currentGlobal.userAgent || '';
+    $('refreshSeconds').value = currentGlobal.refreshSeconds || 20;
+    $('maxZoom').value = currentGlobal.maxZoom || 16;
+  }
+
+  function applyPerson(settings) {
+    currentPerson = settings || {};
+    renderPersonSelect();
+    $('display').value = currentPerson.display === 'place' ? 'place' : 'distance';
+    $('showAvatar').value = currentPerson.showAvatar === false ? 'no' : 'yes';
+  }
+
+  function setAction(uuid) {
+    if (!uuid || actionUuid === uuid) return;
+    actionUuid = uuid;
+    var isPerson = /\.person$/.test(uuid);
+    $('personSection').hidden = !isPerson;
+    // on demand only (opening the PI, "Refresh", a not-yet-connected retry): a <datalist> refreshed every few
+    // seconds froze OpenDeck's WebKitGTK window in the homeassistant plugin
+    if (isPerson && !personsRequested) {
+      personsRequested = true;
+      requestPersons();
+    }
+  }
+
+  function requestPersons() {
+    send({ event: 'sendToPlugin', action: actionUuid, context: piUUID, payload: { event: 'getPersons' } });
+  }
+
+  function renderPersonSelect() {
+    var current = (currentPerson && currentPerson.entityId) || '';
+    var key = JSON.stringify([persons, current]);
+    if (key === personsKey) return;
+    personsKey = key;
+    var select = $('entityId');
+    while (select.firstChild) select.removeChild(select.firstChild);
+    var empty = document.createElement('option');
+    empty.value = '';
+    empty.textContent = '- select a person -';
+    select.appendChild(empty);
+    var found = false;
+    persons.forEach(function (p) {
+      var option = document.createElement('option');
+      option.value = String(p.entityId);
+      option.textContent = String(p.name) + ' (' + String(p.entityId) + ')';
+      if (option.value === current) found = true;
+      select.appendChild(option);
+    });
+    if (current && !found) {
+      var missing = document.createElement('option');
+      missing.value = current;
+      missing.textContent = current + ' (unavailable)';
+      select.appendChild(missing);
+    }
+    select.value = current;
+  }
+
+  function fillPersons(payload) {
+    persons = Array.isArray(payload.persons) ? payload.persons : [];
+    renderPersonSelect();
+    var hint = $('personStatus');
+    if (persons.length > 0) {
+      hint.textContent = 'Available people: ' + persons.length;
+    } else if (payload.status === 'not_configured') {
+      hint.textContent = 'First fill in the Home Assistant URL and token below.';
+    } else if (payload.status === 'auth_error') {
+      hint.textContent = 'Home Assistant rejected the token.';
+    } else {
+      hint.textContent = 'Connecting to Home Assistant... (use "Refresh" once connected)';
+      if (personRetries < 5) {
+        personRetries += 1;
+        setTimeout(requestPersons, 3000);
+      }
+    }
+  }
+
+  function savePerson() {
+    var entityId = $('entityId').value;
+    var payload = { entityId: entityId, display: $('display').value, showAvatar: $('showAvatar').value !== 'no' };
+    currentPerson = payload;
+    send({ event: 'setSettings', context: piUUID, payload: payload });
+  }
+
+  $('entityId').addEventListener('change', savePerson);
+  $('refreshPersons').addEventListener('click', requestPersons);
+  $('display').addEventListener('change', savePerson);
+  $('showAvatar').addEventListener('change', savePerson);
+
+  $('toggleToken').addEventListener('click', function () {
+    var input = $('token');
+    var hidden = input.type === 'password';
+    input.type = hidden ? 'text' : 'password';
+    $('toggleToken').textContent = hidden ? 'Hide' : 'Show';
+  });
+
+  $('save').addEventListener('click', function () {
+    var refresh = parseInt($('refreshSeconds').value, 10);
+    var zoom = parseInt($('maxZoom').value, 10);
+    var settings = {
+      haUrl: $('haUrl').value.trim(),
+      token: $('token').value.trim(),
+      tileUrl: $('tileUrl').value.trim(),
+      userAgent: $('userAgent').value.trim(),
+      refreshSeconds: refresh >= 5 ? refresh : 20,
+      maxZoom: zoom >= 8 && zoom <= 18 ? zoom : 16
+    };
+    if (send({ event: 'setGlobalSettings', context: piUUID, payload: settings })) {
+      currentGlobal = settings;
+      setStatus('Saved.', 'ok');
+    } else {
+      setStatus('No connection to OpenDeck - try again in a moment.', 'err');
+    }
+  });
+
+  // Standard function called by the host (Elgato SDK / OpenDeck) after
+  // the Property Inspector page loads. The fifth argument (inActionInfo)
+  // is optional - when it is missing the action type is taken from didReceiveSettings.
+  window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID, inRegisterEvent, inInfo, inActionInfo) {
+    piUUID = inPropertyInspectorUUID;
+    var actionInfo = null;
+    try {
+      actionInfo = typeof inActionInfo === 'string' ? JSON.parse(inActionInfo) : inActionInfo;
+    } catch (e) {
+      actionInfo = null;
+    }
+    if (actionInfo && actionInfo.action) setAction(actionInfo.action);
+
+    websocket = new WebSocket('ws://127.0.0.1:' + inPort);
+
+    websocket.onopen = function () {
+      send({ event: inRegisterEvent, uuid: inPropertyInspectorUUID });
+      send({ event: 'getGlobalSettings', context: inPropertyInspectorUUID });
+      send({ event: 'getSettings', context: inPropertyInspectorUUID });
+    };
+
+    websocket.onmessage = function (msg) {
+      var data;
+      try {
+        data = JSON.parse(msg.data);
+      } catch (e) {
+        return;
+      }
+      if (data.event === 'didReceiveGlobalSettings') {
+        applyGlobal(data.payload && data.payload.settings);
+      } else if (data.event === 'didReceiveSettings') {
+        setAction(data.action);
+        applyPerson(data.payload && data.payload.settings);
+      } else if (data.event === 'sendToPropertyInspector' && data.payload && data.payload.event === 'persons') {
+        fillPersons(data.payload);
+      }
+    };
+
+    websocket.onclose = function () {
+      setStatus('The connection to OpenDeck was closed.', 'err');
+    };
+  };
+</script>
+</body>
+</html>

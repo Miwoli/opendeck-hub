@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "lib": ["ES2022"],
+    // the original ha-map code uses constructor parameter properties; it is only ever bundled by esbuild
+    "erasableSyntaxOnly": false
+  },
+  "include": ["src/**/*.ts"]
+}

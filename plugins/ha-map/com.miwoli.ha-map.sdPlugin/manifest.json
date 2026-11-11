@@ -1,0 +1,44 @@
+{
+  "Name": "HA Map",
+  "Author": "Miwoli",
+  "Version": "0.2.0.0",
+  "Icon": "images/pluginIcon",
+  "Category": "HA Map",
+  "CategoryIcon": "images/pluginCategory",
+  "OS": [
+    { "Platform": "linux" }
+  ],
+  "CodePathLin": "bin/plugin.cjs",
+  "Actions": [
+    {
+      "UUID": "com.miwoli.ha-map.person",
+      "Name": "Person (distance)",
+      "Tooltip": "Distance of a Home Assistant person from home and their current place",
+      "Icon": "images/actionPerson",
+      "Controllers": ["Keypad"],
+      "PropertyInspectorPath": "pi/inspector.html",
+      "States": [
+        {
+          "Image": "images/keyDefaultPerson",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ]
+    },
+    {
+      "UUID": "com.miwoli.ha-map.tile",
+      "Name": "Map tile",
+      "Tooltip": "A slice of the OSM map with the people's locations. Place it on every key of the map profile (except the back key).",
+      "Icon": "images/actionTile",
+      "Controllers": ["Keypad"],
+      "PropertyInspectorPath": "pi/inspector.html",
+      "States": [
+        {
+          "Image": "images/keyDefaultTile",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ]
+    }
+  ]
+}

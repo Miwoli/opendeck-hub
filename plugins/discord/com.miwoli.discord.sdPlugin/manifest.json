@@ -1,0 +1,36 @@
+{
+  "Name": "Discord (Vesktop)",
+  "Author": "Miwoli",
+  "Version": "0.1.0.0",
+  "Icon": "images/pluginIcon",
+  "Category": "Discord",
+  "CategoryIcon": "images/pluginCategory",
+  "OS": [{ "Platform": "linux" }],
+  "CodePathLin": "bin/plugin.cjs",
+  "Actions": [
+    {
+      "UUID": "com.miwoli.discord.mic",
+      "Name": "Mic",
+      "Tooltip": "Mutes / unmutes the microphone in Discord (Vesktop, requires the DeckBridge userplugin)",
+      "Icon": "images/actionMic",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyMic", "ShowTitle": false }]
+    },
+    {
+      "UUID": "com.miwoli.discord.headphones",
+      "Name": "Headphones",
+      "Tooltip": "Deafens / undeafens in Discord",
+      "Icon": "images/actionHeadphones",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyHeadphones", "ShowTitle": false }]
+    },
+    {
+      "UUID": "com.miwoli.discord.ptt",
+      "Name": "Push to talk",
+      "Tooltip": "Microphone is live only while the key is held (Discord in voice-activity mode)",
+      "Icon": "images/actionPtt",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyPtt", "ShowTitle": false }]
+    }
+  ]
+}

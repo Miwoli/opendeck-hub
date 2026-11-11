@@ -1,0 +1,37 @@
+{
+  "Name": "System",
+  "Author": "Miwoli",
+  "Version": "0.1.0.0",
+  "Icon": "images/pluginIcon",
+  "Category": "System",
+  "CategoryIcon": "images/pluginCategory",
+  "OS": [{ "Platform": "linux" }],
+  "CodePathLin": "bin/plugin.cjs",
+  "Actions": [
+    {
+      "UUID": "com.miwoli.system.poweroff",
+      "Name": "Power",
+      "Tooltip": "Shuts the computer down: hold for 1 s, release, then press again within 3 s",
+      "Icon": "images/actionPower",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyPower", "ShowTitle": false }]
+    },
+    {
+      "UUID": "com.miwoli.system.screenshot",
+      "Name": "Screenshot",
+      "Tooltip": "Takes a screenshot with Spectacle in the background (full desktop / monitor / window)",
+      "Icon": "images/actionScreenshot",
+      "Controllers": ["Keypad"],
+      "PropertyInspectorPath": "pi/screenshot.html",
+      "States": [{ "Image": "images/keyScreenshot", "ShowTitle": false }]
+    },
+    {
+      "UUID": "com.miwoli.system.clock",
+      "Name": "Clock",
+      "Tooltip": "Time, weekday and date",
+      "Icon": "images/actionClock",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyClock", "ShowTitle": false }]
+    }
+  ]
+}

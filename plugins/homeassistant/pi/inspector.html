@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Home Assistant - settings</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #090A0F;
+    --panel: #12141B;
+    --raised: #1B1E28;
+    --line: rgba(255, 255, 255, 0.08);
+    --text: #ECEDF2;
+    --text2: #A6ACBD;
+    --label: #8A90A2;
+    --ember: #FFB547;
+    --mint: #5BE3A5;
+    --alert: #FF5C5C;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); font: 13px Manrope, system-ui, sans-serif; }
+  .field { margin-bottom: 14px; }
+  label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--label); text-transform: uppercase; font-size: 10px; letter-spacing: 0.12em; }
+  select, input { width: 100%; background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 8px 10px; font: inherit; }
+  select:focus, input:focus { outline: none; border-color: var(--ember); }
+  p.hint { color: var(--text2); margin: 4px 0 0; line-height: 1.5; font-size: 12px; }
+  ul { list-style: none; margin: 6px 0 0; padding: 0; }
+  li { padding: 6px 10px; margin-bottom: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; display: flex; justify-content: space-between; }
+  .on { color: var(--mint); } .off { color: var(--label); }
+  button { background: var(--raised); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 8px 12px; font: inherit; cursor: pointer; }
+  button:hover { border-color: var(--ember); }
+  .row { display: flex; gap: 8px; }
+  .ok { color: var(--mint); font-size: 12px; }
+  #status { color: var(--alert); font-size: 12px; min-height: 16px; }
+</style>
+</head>
+<body>
+  <div class="field">
+    <label for="sensor">Temperature sensor</label>
+    <select id="sensor"></select>
+  </div>
+  <div class="field">
+    <label for="toggle">Pressing toggles</label>
+    <select id="toggle"></select>
+    <p class="hint">homeassistant.toggle - lights, switches, input_boolean. "-" = the key only shows the temperature.</p>
+  </div>
+  <div class="field row"><button id="refresh">Refresh entity list</button></div>
+  <div class="field">
+    <label for="label">Tile name</label>
+    <input id="label" maxlength="14" placeholder="Office" />
+  </div>
+  <div class="field">
+    <label>Bar range (°C)</label>
+    <div class="row"><input id="min" type="number" step="1" placeholder="10" /><input id="max" type="number" step="1" placeholder="30" /></div>
+  </div>
+  <div class="field">
+    <label for="haUrl">Home Assistant (shared)</label>
+    <input id="haUrl" placeholder="http://homeassistant.local:8123" />
+  </div>
+  <div class="field">
+    <label for="token">Long-lived token</label>
+    <input id="token" type="password" placeholder="paste the token (Profile → Security)" />
+    <p class="hint">The token is stored in the OpenDeck plugin settings on disk (plain JSON).</p>
+  </div>
+  <div class="field row">
+    <button id="save">Save connection</button>
+    <button id="import">Use the URL and token from HA Map</button>
+  </div>
+  <div class="field"><span id="haStatus" class="hint"></span></div>
+  <div id="status"></div>
+<script>
+  'use strict';
+  var websocket = null, piUUID = null, settings = {}, global = {}, retried = false;
+  var actionUuid = 'com.miwoli.homeassistant.temperature';
+  function $(id) { return document.getElementById(id); }
+  function send(msg) { if (!websocket || websocket.readyState !== 1) return false; websocket.send(JSON.stringify(msg)); return true; }
+  var lists = { temperature: [], toggles: [] }, listsKey = '';
+  // <select>s are rebuilt only when the entity lists or the saved value actually change (never on a timer):
+  // a periodically rebuilt <datalist> with ~450 entries froze OpenDeck's WebKitGTK window.
+  function fillSelect(select, items, current, emptyLabel) {
+    while (select.firstChild) select.removeChild(select.firstChild);
+    var empty = document.createElement('option'); empty.value = ''; empty.textContent = emptyLabel; select.appendChild(empty);
+    var found = false;
+    items.forEach(function (e) {
+      var o = document.createElement('option'); o.value = e.id; o.textContent = e.name + ' (' + e.id + ')';
+      if (e.id === current) found = true;
+      select.appendChild(o);
+    });
+    if (current && !found) { var o = document.createElement('option'); o.value = current; o.textContent = current + ' (unavailable)'; select.appendChild(o); }
+    select.value = current || '';
+  }
+  function renderLists() {
+    var key = JSON.stringify([lists, settings.sensor || '', settings.toggle || '']);
+    if (key === listsKey) return;
+    listsKey = key;
+    fillSelect($('sensor'), lists.temperature, settings.sensor || '', '— select a sensor —');
+    fillSelect($('toggle'), lists.toggles, settings.toggle || '', '—');
+  }
+  function render() {
+    renderLists();
+    $('label').value = settings.label || '';
+    $('min').value = settings.min !== undefined ? settings.min : '';
+    $('max').value = settings.max !== undefined ? settings.max : '';
+    $('haUrl').value = global.haUrl || '';
+    $('token').value = '';
+    $('token').placeholder = global.token ? 'saved (paste to change)' : 'paste the token (Profile → Security)';
+  }
+  function saveAction() {
+    var p = { sensor: $('sensor').value, toggle: $('toggle').value, label: $('label').value.trim() };
+    if ($('min').value !== '') p.min = Number($('min').value);
+    if ($('max').value !== '') p.max = Number($('max').value);
+    settings = p;
+    if (!send({ event: 'setSettings', context: piUUID, payload: p })) $('status').textContent = 'No connection to OpenDeck.';
+  }
+  ['sensor', 'toggle', 'label', 'min', 'max'].forEach(function (id) { $(id).addEventListener('change', saveAction); });
+  $('save').addEventListener('click', function () {
+    var next = Object.assign({}, global, { haUrl: $('haUrl').value.trim() });
+    if ($('token').value.trim()) next.token = $('token').value.trim();
+    global = next;
+    if (send({ event: 'setGlobalSettings', context: piUUID, payload: next })) { $('status').textContent = ''; render(); requestEntities(); }
+  });
+  $('refresh').addEventListener('click', requestEntities);
+  $('import').addEventListener('click', function () {
+    send({ event: 'sendToPlugin', action: actionUuid, context: piUUID, payload: { event: 'importHaMap' } });
+  });
+  function requestEntities() { send({ event: 'sendToPlugin', action: actionUuid, context: piUUID, payload: { event: 'getEntities' } }); }
+  var labels = { connected: 'Connected to Home Assistant', connecting: 'Connecting…', offline: 'No connection', auth_error: 'Home Assistant rejected the token', not_configured: 'Enter the URL and token' };
+  window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID, inRegisterEvent) {
+    piUUID = inPropertyInspectorUUID;
+    websocket = new WebSocket('ws://127.0.0.1:' + inPort);
+    websocket.onopen = function () {
+      send({ event: inRegisterEvent, uuid: inPropertyInspectorUUID });
+      send({ event: 'getSettings', context: inPropertyInspectorUUID });
+      send({ event: 'getGlobalSettings', context: inPropertyInspectorUUID });
+      requestEntities();
+    };
+    websocket.onmessage = function (msg) {
+      var data; try { data = JSON.parse(msg.data); } catch (e) { return; }
+      if (data.event === 'didReceiveSettings') { settings = (data.payload && data.payload.settings) || {}; render(); }
+      else if (data.event === 'didReceiveGlobalSettings') { global = (data.payload && data.payload.settings) || {}; render(); }
+      else if (data.event === 'sendToPropertyInspector' && data.payload) {
+        if (data.payload.event === 'entities') {
+          lists = { temperature: data.payload.temperature || [], toggles: data.payload.toggles || [] };
+          $('haStatus').textContent = (labels[data.payload.status] || data.payload.status) + ' · temperature sensors: ' + lists.temperature.length + ' · switches: ' + lists.toggles.length;
+          renderLists();
+          // the HA connection may still be starting when the PI opens; ask once more instead of polling
+          if (data.payload.status !== 'connected' && data.payload.status !== 'auth_error' && !retried) { retried = true; setTimeout(requestEntities, 2000); }
+        } else if (data.payload.event === 'imported') {
+          $('status').textContent = data.payload.ok ? '' : 'HA Map settings not found.';
+          if (data.payload.ok) { global.haUrl = data.payload.haUrl; global.token = 'set'; render(); send({ event: 'getGlobalSettings', context: piUUID }); }
+        }
+      }
+    };
+    websocket.onclose = function () { $('status').textContent = 'The connection to OpenDeck was closed.'; };
+  };
+</script>
+</body>
+</html>

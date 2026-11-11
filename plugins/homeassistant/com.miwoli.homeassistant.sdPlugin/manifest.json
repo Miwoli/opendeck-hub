@@ -1,0 +1,21 @@
+{
+  "Name": "Home Assistant",
+  "Author": "Miwoli",
+  "Version": "0.1.0.0",
+  "Icon": "images/pluginIcon",
+  "Category": "Home Assistant",
+  "CategoryIcon": "images/pluginCategory",
+  "OS": [{ "Platform": "linux" }],
+  "CodePathLin": "bin/plugin.cjs",
+  "PropertyInspectorPath": "pi/inspector.html",
+  "Actions": [
+    {
+      "UUID": "com.miwoli.homeassistant.temperature",
+      "Name": "Temperature (+ light)",
+      "Tooltip": "Temperature from a Home Assistant sensor; pressing toggles the selected entity (light)",
+      "Icon": "images/action",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "images/keyDefault", "ShowTitle": false }]
+    }
+  ]
+}

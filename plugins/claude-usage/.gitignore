@@ -1,0 +1,8 @@
+node_modules/
+dist-typecheck/
+*.log
+com.miwoli.claude-usage.sdPlugin/bin/
+com.miwoli.claude-usage.sdPlugin/images/
+com.miwoli.claude-usage.sdPlugin/pi/
+*.streamDeckPlugin
+*.zip

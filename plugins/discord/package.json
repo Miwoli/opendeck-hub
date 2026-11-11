@@ -1,0 +1,22 @@
+{
+  "name": "com.miwoli.discord",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenDeck plugin: Discord (Vesktop) mute, deafen and push-to-talk via the DeckBridge Vencord userplugin.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-icons.ts && node ../../scripts/build-plugin.mjs",
+    "watch": "node ../../scripts/build-plugin.mjs --watch",
+    "install-plugin": "npm run build && node ../../scripts/install-plugin.mjs",
+    "pack": "npm run build && node ../../scripts/pack-plugin.mjs",
+    "typecheck": "tsc --noEmit",
+    "smoke": "node ../../scripts/smoke-plugin.mjs",
+    "test": "node ../../scripts/build-plugin.mjs && node --test 'test/**/*.test.ts' && node ../../scripts/smoke-plugin.mjs",
+    "vencord": "node scripts/vencord.mjs"
+  },
+  "dependencies": {
+    "@miwoli/deck-core": "*",
+    "ws": "^8.18.0"
+  }
+}

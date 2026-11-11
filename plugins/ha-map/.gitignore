@@ -1,0 +1,9 @@
+node_modules/
+dist-typecheck/
+dist/
+*.log
+com.miwoli.ha-map.sdPlugin/bin/
+com.miwoli.ha-map.sdPlugin/images/
+com.miwoli.ha-map.sdPlugin/pi/
+*.streamDeckPlugin
+*.zip

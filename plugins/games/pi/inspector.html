@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Games - settings</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #090A0F;
+    --panel: #12141B;
+    --raised: #1B1E28;
+    --line: rgba(255, 255, 255, 0.08);
+    --text: #ECEDF2;
+    --text2: #A6ACBD;
+    --label: #8A90A2;
+    --ember: #FFB547;
+    --mint: #5BE3A5;
+    --alert: #FF5C5C;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); font: 13px Manrope, system-ui, sans-serif; }
+  .field { margin-bottom: 14px; }
+  label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--label); text-transform: uppercase; font-size: 10px; letter-spacing: 0.12em; }
+  select, input { width: 100%; background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 8px 10px; font: inherit; }
+  select:focus, input:focus { outline: none; border-color: var(--ember); }
+  p.hint { color: var(--text2); margin: 4px 0 0; line-height: 1.5; font-size: 12px; }
+  ul { list-style: none; margin: 6px 0 0; padding: 0; }
+  li { padding: 6px 10px; margin-bottom: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; display: flex; justify-content: space-between; }
+  .on { color: var(--mint); } .off { color: var(--label); }
+  #status { color: var(--alert); font-size: 12px; min-height: 16px; }
+</style>
+</head>
+<body>
+  <div class="field" id="launcherSection" hidden>
+    <label for="platform">Library</label>
+    <select id="platform"><option value="steam">Steam</option><option value="lutris">Lutris</option></select>
+  </div>
+  <div class="field" id="recentSection" hidden>
+    <label for="slot">Position in the recently played list</label>
+    <select id="slot"><option value="">Automatic (by column)</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+    <p class="hint">The list merges Steam and Lutris, most recently played first. Covers come from the local Steam/Lutris caches (no network).</p>
+  </div>
+  <div class="field" id="excludeSection" hidden>
+    <label for="exclude">Ignored in Lutris (slugs, comma separated)</label>
+    <input id="exclude" placeholder="ubisoft-connect, epic-games-store, ea-app, …" />
+    <p class="hint">Shared setting. Empty = the default list of launchers. Steam games added to Lutris are always skipped (they are already in Steam).</p>
+  </div>
+  <div class="field" id="infoSection" hidden><p class="hint" id="info"></p></div>
+  <div id="status"></div>
+<script>
+  'use strict';
+  var websocket = null, piUUID = null, action = '', settings = {}, global = {};
+  function $(id) { return document.getElementById(id); }
+  function send(msg) { if (!websocket || websocket.readyState !== 1) return false; websocket.send(JSON.stringify(msg)); return true; }
+  function render() {
+    var kind = action.split('.').pop();
+    $('launcherSection').hidden = kind !== 'launcher';
+    $('recentSection').hidden = kind !== 'recent';
+    $('excludeSection').hidden = kind !== 'recent';
+    $('infoSection').hidden = kind !== 'gamemode' && kind !== 'closegame';
+    $('info').textContent = kind === 'gamemode' ? 'For now this is only a toggle with state - the game mode behaviour is not defined yet.'
+      : 'Closes the game started by Steam or Lutris: hold for 1 s, release, then press again within 3 s.';
+    $('platform').value = settings.platform === 'lutris' ? 'lutris' : 'steam';
+    $('slot').value = settings.slot ? String(settings.slot) : '';
+    $('exclude').value = typeof global.lutrisExclude === 'string' ? global.lutrisExclude : '';
+  }
+  function saveAction() {
+    var kind = action.split('.').pop();
+    var payload = kind === 'launcher' ? { platform: $('platform').value } : $('slot').value ? { slot: Number($('slot').value) } : {};
+    settings = payload;
+    if (!send({ event: 'setSettings', context: piUUID, payload: payload })) $('status').textContent = 'No connection to OpenDeck.';
+  }
+  function saveGlobal() {
+    global = Object.assign({}, global, { lutrisExclude: $('exclude').value.trim() });
+    send({ event: 'setGlobalSettings', context: piUUID, payload: global });
+  }
+  $('platform').addEventListener('change', saveAction);
+  $('slot').addEventListener('change', saveAction);
+  $('exclude').addEventListener('change', saveGlobal);
+  window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID, inRegisterEvent, inInfo, inActionInfo) {
+    piUUID = inPropertyInspectorUUID;
+    try { var info = typeof inActionInfo === 'string' ? JSON.parse(inActionInfo) : inActionInfo; if (info && info.action) action = info.action; } catch (e) {}
+    websocket = new WebSocket('ws://127.0.0.1:' + inPort);
+    websocket.onopen = function () {
+      send({ event: inRegisterEvent, uuid: inPropertyInspectorUUID });
+      send({ event: 'getSettings', context: inPropertyInspectorUUID });
+      send({ event: 'getGlobalSettings', context: inPropertyInspectorUUID });
+    };
+    websocket.onmessage = function (msg) {
+      var data; try { data = JSON.parse(msg.data); } catch (e) { return; }
+      if (data.event === 'didReceiveSettings') { action = data.action || action; settings = (data.payload && data.payload.settings) || {}; render(); }
+      else if (data.event === 'didReceiveGlobalSettings') { global = (data.payload && data.payload.settings) || {}; render(); }
+    };
+    websocket.onclose = function () { $('status').textContent = 'The connection to OpenDeck was closed.'; };
+  };
+</script>
+</body>
+</html>

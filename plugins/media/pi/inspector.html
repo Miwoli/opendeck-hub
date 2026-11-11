@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Media - settings</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #090A0F;
+    --panel: #12141B;
+    --raised: #1B1E28;
+    --line: rgba(255, 255, 255, 0.08);
+    --text: #ECEDF2;
+    --text2: #A6ACBD;
+    --label: #8A90A2;
+    --ember: #FFB547;
+    --mint: #5BE3A5;
+    --alert: #FF5C5C;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); font: 13px Manrope, system-ui, sans-serif; }
+  .field { margin-bottom: 14px; }
+  label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--label); text-transform: uppercase; font-size: 10px; letter-spacing: 0.12em; }
+  select, input { width: 100%; background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 8px 10px; font: inherit; }
+  select:focus, input:focus { outline: none; border-color: var(--ember); }
+  p.hint { color: var(--text2); margin: 4px 0 0; line-height: 1.5; font-size: 12px; }
+  ul { list-style: none; margin: 6px 0 0; padding: 0; }
+  li { padding: 6px 10px; margin-bottom: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; display: flex; justify-content: space-between; }
+  .on { color: var(--mint); } .off { color: var(--label); }
+  .check { display: flex; gap: 8px; align-items: flex-start; }
+  .check input { width: auto; margin-top: 2px; }
+  .check span { color: var(--text); text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 500; }
+  #status { color: var(--alert); font-size: 12px; min-height: 16px; }
+</style>
+</head>
+<body>
+  <div class="field">
+    <label for="preferred">Player</label>
+    <select id="preferred"></select>
+    <p class="hint">Automatic: the player last chosen with a double press, or the one that started playing last (shared by all pages).
+      A fixed choice (e.g. Spotify) is not changed by a double press while it is running.</p>
+  </div>
+  <div class="field">
+    <label for="doubleTap">Double press</label>
+    <select id="doubleTap">
+      <option value="switch">Switch player</option>
+      <option value="next">Next track</option>
+      <option value="previous">Previous track</option>
+      <option value="none">Nothing</option>
+    </select>
+    <p class="hint">Dots at the top of the tile = active players (orange = playing, wide = shown).
+      When a double press has something to do, pause / resume waits 0.3 s for a second press.</p>
+  </div>
+  <div class="field">
+    <label for="longPress">Hold (0.5 s)</label>
+    <select id="longPress">
+      <option value="next">Next track</option>
+      <option value="previous">Previous track</option>
+      <option value="switch">Switch player</option>
+      <option value="none">Nothing</option>
+    </select>
+    <p class="hint">A short press always pauses / resumes.</p>
+  </div>
+  <div class="field">
+    <label>Covers from the internet</label>
+    <label class="check"><input type="checkbox" id="allowRemoteArt" /><span>Download covers from the address given by the player (e.g. Spotify: i.scdn.co)</span></label>
+    <p class="hint">Shared by all Media tiles. When off, covers come only from local files (e.g. the browser); otherwise a gradient is shown.
+      Downloaded covers are kept in ~/.cache/opendeck-hub/covers.</p>
+  </div>
+  <div class="field">
+    <label>Detected players</label>
+    <ul id="players"><li class="off">loading…</li></ul>
+  </div>
+  <div id="status"></div>
+<script>
+  'use strict';
+  var websocket = null;
+  var piUUID = null;
+  var actionUuid = 'com.miwoli.media.player';
+  var settings = {};
+  var global = {};
+  var players = [];
+  function $(id) { return document.getElementById(id); }
+  function send(msg) {
+    if (!websocket || websocket.readyState !== 1) return false;
+    websocket.send(JSON.stringify(msg));
+    return true;
+  }
+  function render() {
+    var select = $('preferred');
+    while (select.firstChild) select.removeChild(select.firstChild);
+    var auto = document.createElement('option');
+    auto.value = '';
+    auto.textContent = 'Automatic';
+    select.appendChild(auto);
+    var ids = players.map(function (p) { return p.id; });
+    if (settings.preferred && ids.indexOf(settings.preferred) < 0) ids.push(settings.preferred);
+    ids.forEach(function (id) {
+      var o = document.createElement('option');
+      var info = players.filter(function (p) { return p.id === id; })[0];
+      o.value = id;
+      o.textContent = info ? info.label : id + ' (not running)';
+      select.appendChild(o);
+    });
+    select.value = settings.preferred || '';
+    $('longPress').value = settings.longPress || 'next';
+    $('doubleTap').value = settings.doubleTap || 'switch';
+    $('allowRemoteArt').checked = global.allowRemoteArt === true;
+    var list = $('players');
+    while (list.firstChild) list.removeChild(list.firstChild);
+    players.forEach(function (p) {
+      var li = document.createElement('li');
+      var a = document.createElement('span'); a.textContent = p.label;
+      var b = document.createElement('span'); b.className = p.status === 'Playing' ? 'on' : 'off';
+      b.textContent = p.status === 'Playing' ? 'playing' : p.status === 'Paused' ? 'paused' : 'stopped';
+      li.appendChild(a); li.appendChild(b); list.appendChild(li);
+    });
+    if (players.length === 0) {
+      var li = document.createElement('li'); li.className = 'off'; li.textContent = 'no player is running'; list.appendChild(li);
+    }
+  }
+  function saveAction() {
+    settings = { preferred: $('preferred').value, longPress: $('longPress').value, doubleTap: $('doubleTap').value };
+    if (!send({ event: 'setSettings', context: piUUID, payload: settings })) $('status').textContent = 'No connection to OpenDeck.';
+  }
+  function saveGlobal() {
+    global = Object.assign({}, global, { allowRemoteArt: $('allowRemoteArt').checked });
+    if (!send({ event: 'setGlobalSettings', context: piUUID, payload: global })) $('status').textContent = 'No connection to OpenDeck.';
+  }
+  $('preferred').addEventListener('change', saveAction);
+  $('longPress').addEventListener('change', saveAction);
+  $('doubleTap').addEventListener('change', saveAction);
+  $('allowRemoteArt').addEventListener('change', saveGlobal);
+  window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID, inRegisterEvent) {
+    piUUID = inPropertyInspectorUUID;
+    websocket = new WebSocket('ws://127.0.0.1:' + inPort);
+    websocket.onopen = function () {
+      send({ event: inRegisterEvent, uuid: inPropertyInspectorUUID });
+      send({ event: 'getSettings', context: inPropertyInspectorUUID });
+      send({ event: 'getGlobalSettings', context: inPropertyInspectorUUID });
+      send({ event: 'sendToPlugin', action: actionUuid, context: inPropertyInspectorUUID, payload: { event: 'getPlayers' } });
+    };
+    websocket.onmessage = function (msg) {
+      var data;
+      try { data = JSON.parse(msg.data); } catch (e) { return; }
+      if (data.event === 'didReceiveSettings') { settings = (data.payload && data.payload.settings) || {}; render(); }
+      else if (data.event === 'didReceiveGlobalSettings') { global = (data.payload && data.payload.settings) || {}; render(); }
+      else if (data.event === 'sendToPropertyInspector' && data.payload && data.payload.event === 'players') {
+        players = Array.isArray(data.payload.players) ? data.payload.players : [];
+        render();
+      }
+    };
+    websocket.onclose = function () { $('status').textContent = 'The connection to OpenDeck was closed.'; };
+  };
+</script>
+</body>
+</html>
