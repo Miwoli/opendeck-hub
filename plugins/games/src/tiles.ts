@@ -23,7 +23,9 @@ export function gameModeTile(on: boolean): IconTileSpec {
 
 const CLOSE = { glyph: 'close', name: 'Close game', idleStatus: 'hold 1 s', idleTone: 'danger', confirmName: 'Close?' } as const;
 
-export function closeGameTile(view: HoldView, running: boolean): IconTileSpec {
+/** Idle + known running game -> the danger tile over the game's dimmed cover, title where "no game" shows; hold/confirm unchanged. */
+export function closeGameTile(view: HoldView, running: boolean, game: Game | null = null, cover: string | null = null): IconTileSpec {
   if (!running && view.phase === 'idle') return { template: 'icon', tone: 'offline', glyph: 'close', name: 'Close game', status: 'no game' };
+  if (running && game && view.phase === 'idle') return { ...holdTile(view, CLOSE), status: game.name, backdrop: cover ? { image: cover } : {} };
   return holdTile(view, CLOSE);
 }
