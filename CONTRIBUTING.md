@@ -68,7 +68,7 @@ settings and troubleshooting steps.
   always with a timeout. Clean up timers and processes in `willDisappear` and on exit.
 - Comments should explain why something is done, not what the code does. Please do not leave dates, task numbers or
   references to private notes in the code.
-- Version plugins with [SemVer](https://semver.org/) and note user-visible changes in two places: the plugin's `plugins/<name>/CHANGELOG.md` (under its version heading) and the root `CHANGELOG.md` (one line prefixed with `**<plugin> <version>**:`). Core-only changes go in the root file under `**core**`.
+- Version plugins with [SemVer](https://semver.org/) through [release-please](#releases); do not edit versions or changelogs by hand.
 - A plugin should provide the npm scripts `build`, `watch`, `install-plugin`, `pack`, `typecheck`, `smoke` and `test`,
   plus a README covering installation, settings and troubleshooting.
 
@@ -76,6 +76,29 @@ settings and troubleshooting steps.
 
 Plugins use `com.miwoli.<name>` and actions use `com.miwoli.<name>.<action>`. Please never rename the UUID of an
 existing plugin or action: OpenDeck stores profiles by UUID, so a rename breaks every profile that already uses it.
+
+## Releases
+
+Releases are automated with release-please (`.github/workflows/release.yml`). Pull requests are squash-merged, so the
+title is the commit message: `feat(<plugin>): ...` makes a minor release, `fix(<plugin>): ...` a patch (while a plugin is
+below 1.0, a breaking change also bumps the minor). Other types (`docs`, `ci`, `chore`, `refactor`, `test`) release
+nothing. A change is attributed to a plugin by the files it touches, not by the scope. After releasable commits land on
+`main`, release-please keeps one release PR per plugin open (version in `package.json` and the manifest, and
+`plugins/<name>/CHANGELOG.md`). Merging it tags `<plugin>-v<version>` and creates a draft release; the workflow then runs
+the checks, uploads the `.streamDeckPlugin` and its `.sha256`, and publishes the release.
+
+`packages/core` is bundled into every plugin but is not released on its own. A change to core that should reach users must
+be committed together with a change in each affected plugin, for example `fix(games): ...`, so that plugin gets a release.
+
+### Maintainer setup: GitHub App token
+
+Pull requests opened with the default `GITHUB_TOKEN` do not start CI, so the release workflow uses a GitHub App token.
+
+1. Create a GitHub App (Settings -> Developer settings -> GitHub Apps -> New): no webhook, repository permissions
+   **Contents: read and write**, **Pull requests: read and write**, **Metadata: read** (automatic); everything else none.
+2. Install it on this repository only.
+3. Generate a private key on the App page, and note the App's Client ID.
+4. Add repository secrets `RELEASE_APP_CLIENT_ID` (the Client ID) and `RELEASE_APP_PRIVATE_KEY` (the full `.pem` contents).
 
 ## Working with OpenDeck
 

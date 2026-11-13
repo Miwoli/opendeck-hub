@@ -6,7 +6,9 @@
   "Category": "HA Map",
   "CategoryIcon": "images/pluginCategory",
   "OS": [
-    { "Platform": "linux" }
+    {
+      "Platform": "linux"
+    }
   ],
   "CodePathLin": "bin/plugin.cjs",
   "Actions": [
@@ -15,7 +17,9 @@
       "Name": "Person (distance)",
       "Tooltip": "Distance of a Home Assistant person from home and their current place",
       "Icon": "images/actionPerson",
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "PropertyInspectorPath": "pi/inspector.html",
       "States": [
         {
@@ -30,7 +34,9 @@
       "Name": "Map tile",
       "Tooltip": "A slice of the OSM map with the people's locations. Place it on every key of the map profile (except the back key).",
       "Icon": "images/actionTile",
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "PropertyInspectorPath": "pi/inspector.html",
       "States": [
         {

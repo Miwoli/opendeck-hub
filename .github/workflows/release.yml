@@ -1,0 +1,90 @@
+name: Release
+
+# release-please opens one release PR per plugin. Merging it creates the tag and a DRAFT release (config: "draft" and
+# "force-tag-creation"); the publish job then re-runs the checks, uploads the asset and only then publishes the draft,
+# so failing tests leave the release unpublished.
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release-please:
+    name: Release PR
+    runs-on: ubuntu-latest
+    outputs:
+      paths_released: ${{ steps.rp.outputs.paths_released }}
+    steps:
+      # A GitHub App token (not GITHUB_TOKEN) so that release PRs trigger the CI workflow. Setup: CONTRIBUTING.md.
+      - uses: actions/create-github-app-token@v3
+        id: app
+        with:
+          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - uses: googleapis/release-please-action@v5.0.0
+        id: rp
+        with:
+          token: ${{ steps.app.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    name: Publish ${{ matrix.path }}
+    needs: release-please
+    if: needs.release-please.outputs.paths_released != '' && needs.release-please.outputs.paths_released != '[]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        path: ${{ fromJSON(needs.release-please.outputs.paths_released) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Resolve tag and check versions
+        id: rel
+        run: |
+          name=$(basename "$MATRIX_PATH")
+          version=$(node -p "require('./$MATRIX_PATH/package.json').version")
+          echo "tag=$name-v$version" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "title=$(node -p "const fs=require('fs');const d='$MATRIX_PATH';const sd=fs.readdirSync(d).find(f=>f.endsWith('.sdPlugin'));require('./'+d+'/'+sd+'/manifest.json').Name + ' $version'")" >> "$GITHUB_OUTPUT"
+          npm run check-versions -- "$name-v$version"
+        env:
+          MATRIX_PATH: ${{ matrix.path }}
+
+      - name: Build and pack
+        run: npm run pack -w "$MATRIX_PATH"
+        env:
+          MATRIX_PATH: ${{ matrix.path }}
+
+      - name: Upload assets and publish the release
+        run: |
+          set -euo pipefail
+          asset=$(ls "$MATRIX_PATH"/dist/*.streamDeckPlugin)
+          gh release upload "$TAG" "$asset#$TITLE – OpenDeck plugin" "$asset.sha256#$TITLE – SHA256 checksum" --clobber
+          gh release edit "$TAG" --title "$TITLE" --draft=false
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          MATRIX_PATH: ${{ matrix.path }}
+          TAG: ${{ steps.rel.outputs.tag }}
+          TITLE: ${{ steps.rel.outputs.title }}

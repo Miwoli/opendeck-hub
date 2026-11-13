@@ -5,7 +5,11 @@
   "Icon": "images/pluginIcon",
   "Category": "Home Assistant",
   "CategoryIcon": "images/pluginCategory",
-  "OS": [{ "Platform": "linux" }],
+  "OS": [
+    {
+      "Platform": "linux"
+    }
+  ],
   "CodePathLin": "bin/plugin.cjs",
   "PropertyInspectorPath": "pi/inspector.html",
   "Actions": [
@@ -14,8 +18,15 @@
       "Name": "Temperature (+ light)",
       "Tooltip": "Temperature from a Home Assistant sensor; pressing toggles the selected entity (light)",
       "Icon": "images/action",
-      "Controllers": ["Keypad"],
-      "States": [{ "Image": "images/keyDefault", "ShowTitle": false }]
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "images/keyDefault",
+          "ShowTitle": false
+        }
+      ]
     }
   ]
 }

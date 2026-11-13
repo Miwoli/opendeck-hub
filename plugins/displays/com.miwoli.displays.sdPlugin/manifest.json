@@ -5,7 +5,11 @@
   "Icon": "images/pluginIcon",
   "Category": "Displays",
   "CategoryIcon": "images/pluginCategory",
-  "OS": [{ "Platform": "linux" }],
+  "OS": [
+    {
+      "Platform": "linux"
+    }
+  ],
   "CodePathLin": "bin/plugin.cjs",
   "PropertyInspectorPath": "pi/inspector.html",
   "Actions": [
@@ -14,8 +18,15 @@
       "Name": "Screen layout",
       "Tooltip": "Switches to a single screen or an extended desktop (kscreen-doctor). The layout is chosen in the key settings.",
       "Icon": "images/action",
-      "Controllers": ["Keypad"],
-      "States": [{ "Image": "images/keyDefault", "ShowTitle": false }]
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "images/keyDefault",
+          "ShowTitle": false
+        }
+      ]
     }
   ]
 }

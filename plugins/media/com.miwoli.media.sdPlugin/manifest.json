@@ -5,7 +5,11 @@
   "Icon": "images/pluginIcon",
   "Category": "Media",
   "CategoryIcon": "images/pluginCategory",
-  "OS": [{ "Platform": "linux" }],
+  "OS": [
+    {
+      "Platform": "linux"
+    }
+  ],
   "CodePathLin": "bin/plugin.cjs",
   "PropertyInspectorPath": "pi/inspector.html",
   "Actions": [
@@ -14,8 +18,15 @@
       "Name": "Player",
       "Tooltip": "Now playing (Spotify, browser…): press = pause/resume, double press = switch player, hold = next track",
       "Icon": "images/action",
-      "Controllers": ["Keypad"],
-      "States": [{ "Image": "images/keyDefault", "ShowTitle": false }]
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "images/keyDefault",
+          "ShowTitle": false
+        }
+      ]
     }
   ]
 }
