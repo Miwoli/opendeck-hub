@@ -1,6 +1,7 @@
 node_modules/
 dist/
 *.streamDeckPlugin
+*.streamDeckPlugin.sha256
 *.log
 .env
 # build output inside .sdPlugin (generated)

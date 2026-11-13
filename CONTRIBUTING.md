@@ -68,7 +68,7 @@ settings and troubleshooting steps.
   always with a timeout. Clean up timers and processes in `willDisappear` and on exit.
 - Comments should explain why something is done, not what the code does. Please do not leave dates, task numbers or
   references to private notes in the code.
-- Version plugins with [SemVer](https://semver.org/) and note user-visible changes in `CHANGELOG.md`.
+- Version plugins with [SemVer](https://semver.org/) and note user-visible changes in two places: the plugin's `plugins/<name>/CHANGELOG.md` (under its version heading) and the root `CHANGELOG.md` (one line prefixed with `**<plugin> <version>**:`). Core-only changes go in the root file under `**core**`.
 - A plugin should provide the npm scripts `build`, `watch`, `install-plugin`, `pack`, `typecheck`, `smoke` and `test`,
   plus a README covering installation, settings and troubleshooting.
 
