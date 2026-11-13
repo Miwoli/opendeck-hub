@@ -105,5 +105,13 @@ describe('tiles', () => {
     assert.equal(closeGameTile({ phase: 'idle' }, false).status, 'no game');
     assert.equal(closeGameTile({ phase: 'idle' }, true).tone, 'danger');
     assert.equal(closeGameTile({ phase: 'confirm', secondsLeft: 2 }, true).name, 'Close?');
+    const game = { source: 'steam', id: '1', name: 'Alpha', lastPlayed: 1, cover: null } as const;
+    const withCover = closeGameTile({ phase: 'idle' }, true, game, 'data:image/jpeg;base64,AA');
+    assert.deepEqual([withCover.name, withCover.status, withCover.tone, withCover.glyph], ['Close game', 'Alpha', 'danger', 'close']);
+    assert.deepEqual(withCover.backdrop, { image: 'data:image/jpeg;base64,AA' });
+    assert.deepEqual(closeGameTile({ phase: 'idle' }, true, game).backdrop, {}, 'no cover file -> gradient backdrop');
+    assert.equal(closeGameTile({ phase: 'idle' }, true, null).backdrop, undefined, 'running but unknown (Lutris) -> generic tile');
+    assert.equal(closeGameTile({ phase: 'confirm', secondsLeft: 2 }, true, game).name, 'Close?', 'confirm flow unchanged');
+    assert.equal(closeGameTile({ phase: 'idle' }, false, game).status, 'no game');
   });
 });

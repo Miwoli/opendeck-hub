@@ -41,6 +41,8 @@ export interface IconTileSpec {
   dashed?: boolean;
   /** 0..1 hold-to-confirm progress overlay. */
   holdProgress?: number;
+  /** Dimmed artwork behind the badge and text (a data: URI, or the cover gradient when absent). */
+  backdrop?: { image?: string };
 }
 
 export interface ValueTileSpec {
@@ -266,6 +268,18 @@ function renderIcon(spec: IconTileSpec, { L, surface }: Ctx): string {
   const r = L.badgeR;
   let defs = pal.frame.defs;
   let body = background(pal.frame);
+  if (spec.backdrop) {
+    const [c1, c2] = coverFallback;
+    defs += `<clipPath id="bk"><rect width="${S}" height="${S}" rx="${R}"/></clipPath>`;
+    if (spec.backdrop.image) {
+      body += `<image xlink:href="${escapeXml(spec.backdrop.image)}" width="${S}" height="${S}" preserveAspectRatio="xMidYMid slice" clip-path="url(#bk)"/>`;
+    } else {
+      defs += `<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>`;
+      body += `<rect width="${S}" height="${S}" rx="${R}" fill="url(#bg)"/>`;
+    }
+    // dim the whole art, then darken further so the badge, "Close game" and the title stay readable
+    body += `<rect width="${S}" height="${S}" rx="${R}" fill="${color.ink}" fill-opacity=".62"/>`;
+  }
 
   if (spec.holdProgress !== undefined) {
     const o = holdOverlay(spec.holdProgress);
@@ -280,6 +294,7 @@ function renderIcon(spec: IconTileSpec, { L, surface }: Ctx): string {
     body += a.body;
   } else {
     const op = pal.badgeOpacity !== null ? ` fill-opacity="${pal.badgeOpacity}"` : '';
+    if (spec.backdrop) body += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color.ink}" fill-opacity=".6"/>`;
     body += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${pal.badgeFill}"${op}/>`;
     if (spec.mark !== undefined) {
       body += `<text x="${cx}" y="${cy + 6}" text-anchor="middle" font-family="${font.num}" font-weight="600" font-size="16" fill="${pal.glyph}">${escapeXml(spec.mark)}</text>`;

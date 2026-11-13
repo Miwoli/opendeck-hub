@@ -6,6 +6,7 @@ All notable changes to this project are documented here, labelled by plugin. Eac
 [Semantic Versions](https://semver.org/) and released as the tag `<plugin>-v<version>`.
 
 ## Unreleased
+- **games 0.2.0**: Close game key shows the running Steam game (cover backdrop, red X, "Close game" and the game title).
 - **claude-usage 0.2.0**: first public version.
 - **discord 0.1.0**: first public version.
 - **displays 0.1.0**: first public version.

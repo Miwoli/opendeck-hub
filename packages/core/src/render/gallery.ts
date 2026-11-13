@@ -99,6 +99,7 @@ export const gallery: GallerySection[] = [
       { id: 'games-steam', label: 'Steam', spec: { template: 'icon', tone: 'nav', glyph: 'steam', name: 'Steam', status: 'Library' } },
       { id: 'games-lutris', label: 'Lutris', spec: { template: 'icon', tone: 'nav', glyph: 'lutris', name: 'Lutris', status: 'Library' } },
       { id: 'games-close', label: 'Close game', spec: { ...holdTile({ phase: 'idle' }, closeGame), dashed: true } },
+      { id: 'games-close-running', label: 'Close game (running)', spec: { ...holdTile({ phase: 'idle' }, closeGame), status: 'Hades II', backdrop: {} } },
       cover('games-recent1', 'Game 1', 'Steam', ['#5B4BFF', '#139C9A']),
       cover('games-recent2', 'Game 2', 'Steam', ['#4B3BD6', '#1B1E28']),
       cover('games-recent3', 'Game 3', 'Lutris', ['#139C9A', '#12141B']),
