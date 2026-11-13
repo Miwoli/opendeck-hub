@@ -6,7 +6,9 @@
   "Category": "Claude Usage",
   "CategoryIcon": "images/pluginCategory",
   "OS": [
-    { "Platform": "linux" }
+    {
+      "Platform": "linux"
+    }
   ],
   "CodePathLin": "bin/plugin.cjs",
   "Actions": [
@@ -15,7 +17,9 @@
       "Name": "Claude Session (5h)",
       "Tooltip": "Usage of the Claude.ai account session limit (5h)",
       "Icon": "images/actionSession",
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "PropertyInspectorPath": "pi/global.html",
       "States": [
         {
@@ -30,7 +34,9 @@
       "Name": "Claude Week (7d)",
       "Tooltip": "Usage of the Claude.ai account weekly limit (7 days)",
       "Icon": "images/actionWeekly",
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "PropertyInspectorPath": "pi/global.html",
       "States": [
         {

@@ -1,17 +1,15 @@
 # Changelog
 
-All notable changes to this project are documented here, labelled by plugin. Each plugin also keeps its own
-`plugins/<name>/CHANGELOG.md` with the same entries. The format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/); every plugin is versioned independently with
-[Semantic Versions](https://semver.org/) and released as the tag `<plugin>-v<version>`.
+Every plugin is versioned independently with [Semantic Versions](https://semver.org/) and released as the tag
+`<plugin>-v<version>`. Each plugin keeps its own changelog, written by release-please from the Conventional Commit pull
+request titles; the [Releases](https://github.com/Miwoli/opendeck-hub/releases) page has the notes next to each download.
 
-## Unreleased
-- **games 0.2.0**: Close game key shows the running Steam game (cover backdrop, red X, "Close game" and the game title).
-- **claude-usage 0.2.0**: first public version.
-- **discord 0.1.0**: first public version.
-- **displays 0.1.0**: first public version.
-- **games 0.1.0**: first public version.
-- **ha-map 0.2.0**: first public version.
-- **homeassistant 0.1.0**: first public version.
-- **media 0.2.0**: first public version.
-- **system 0.1.0**: first public version.
+- **Claude Usage**: [changelog](plugins/claude-usage/CHANGELOG.md), [releases](https://github.com/Miwoli/opendeck-hub/releases?q=claude-usage-v)
+- **Discord (Vesktop)**: [changelog](plugins/discord/CHANGELOG.md), [releases](https://github.com/Miwoli/opendeck-hub/releases?q=discord-v)
+- **Displays (KDE)**: [changelog](plugins/displays/CHANGELOG.md), [releases](https://github.com/Miwoli/opendeck-hub/releases?q=displays-v)
+- **Games**: [changelog](plugins/games/CHANGELOG.md), [releases](https://github.com/Miwoli/opendeck-hub/releases?q=games-v)
+- **HA Map**: [changelog](plugins/ha-map/CHANGELOG.md), [releases](https://github.com/Miwoli/opendeck-hub/releases?q=ha-map-v)
+- **Home Assistant**: [changelog](plugins/homeassistant/CHANGELOG.md), [releases](https://github.com/Miwoli/opendeck-hub/releases?q=homeassistant-v)
+- **Media (MPRIS)**: [changelog](plugins/media/CHANGELOG.md), [releases](https://github.com/Miwoli/opendeck-hub/releases?q=media-v)
+- **System**: [changelog](plugins/system/CHANGELOG.md), [releases](https://github.com/Miwoli/opendeck-hub/releases?q=system-v)
+

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "node",
+  "separate-pull-requests": true,
+  "bump-minor-pre-major": true,
+  "draft": true,
+  "force-tag-creation": true,
+  "packages": {
+    "plugins/claude-usage": {
+      "component": "claude-usage",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "com.miwoli.claude-usage.sdPlugin/manifest.json",
+          "jsonpath": "$.Version"
+        }
+      ]
+    },
+    "plugins/discord": {
+      "component": "discord",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "com.miwoli.discord.sdPlugin/manifest.json",
+          "jsonpath": "$.Version"
+        }
+      ]
+    },
+    "plugins/displays": {
+      "component": "displays",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "com.miwoli.displays.sdPlugin/manifest.json",
+          "jsonpath": "$.Version"
+        }
+      ]
+    },
+    "plugins/games": {
+      "component": "games",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "com.miwoli.games.sdPlugin/manifest.json",
+          "jsonpath": "$.Version"
+        }
+      ]
+    },
+    "plugins/ha-map": {
+      "component": "ha-map",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "com.miwoli.ha-map.sdPlugin/manifest.json",
+          "jsonpath": "$.Version"
+        }
+      ]
+    },
+    "plugins/homeassistant": {
+      "component": "homeassistant",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "com.miwoli.homeassistant.sdPlugin/manifest.json",
+          "jsonpath": "$.Version"
+        }
+      ]
+    },
+    "plugins/media": {
+      "component": "media",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "com.miwoli.media.sdPlugin/manifest.json",
+          "jsonpath": "$.Version"
+        }
+      ]
+    },
+    "plugins/system": {
+      "component": "system",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "com.miwoli.system.sdPlugin/manifest.json",
+          "jsonpath": "$.Version"
+        }
+      ]
+    }
+  }
+}
