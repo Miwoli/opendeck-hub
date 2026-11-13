@@ -47,11 +47,16 @@ settings and troubleshooting steps.
 
 ## Making a change
 
-1. Fork the repository and create a branch from `main`.
-2. Make your change. Keep it focused: one fix or feature per pull request is much easier to review.
-3. Add or update tests, and run `npm run typecheck` and `npm test` before you push.
-4. Open a pull request that explains what changed and why. If the behaviour can only be checked on a real OpenDeck,
-   say how you tried it (OpenDeck version, which keys you pressed, what you saw).
+1. Fork the repository and create a branch from an up-to-date `main`. Nothing is committed to `main` directly; every
+   change, including the maintainers' own, goes through a pull request.
+2. Name the branch `<type>/<scope>-<short-description>`, where `type` is `feat`, `fix`, `docs`, `ci`, `chore`, `refactor`
+   or `test`, and `scope` is the plugin directory (`games`), `core`, or `repo` for repo-wide changes. For example
+   `feat/games-close-key-preview` or `ci/repo-pr-workflow`.
+3. Make your change. Keep it focused: one fix or feature per pull request is much easier to review.
+4. Add or update tests, and run `npm run typecheck` and `npm test` before you push.
+5. Open a pull request that explains what changed and why, and link the issue (`Closes #<n>`). Pull requests are
+   squash-merged, so give the title the form `<type>(<scope>): <summary>`. If the behaviour can only be checked on a
+   real OpenDeck, say how you tried it (OpenDeck version, which keys you pressed, what you saw).
 
 ## Code style
 
