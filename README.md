@@ -22,6 +22,13 @@ provides the OpenAction client, settings helpers, the tile renderer and hold-to-
 | `packages/core` | `@miwoli/deck-core` | Shared library |
 | `scripts/` | | Shared build / install / pack / smoke scripts |
 
+## Install
+Download the `.streamDeckPlugin` file of the plugin you want from the
+[Releases](https://github.com/Miwoli/opendeck-hub/releases) page (one release per plugin, tagged `<plugin>-v<version>`).
+Optionally verify it with the `.sha256` file next to it: `sha256sum -c <file>.streamDeckPlugin.sha256`.
+`dev-preview` is a developer tool and is not released.
+Then in OpenDeck open **Plugins -> Install from file**, pick the archive and restart OpenDeck.
+
 ## Requirements
 - Linux with OpenDeck installed (native package or Flatpak)
 - Node.js >= 22.18 for development (tests and the preview run TypeScript directly); the plugin bundles target Node 20
