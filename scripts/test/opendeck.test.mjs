@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
@@ -51,4 +51,35 @@ test('backup moves the old copy instead of deleting it', () =>
     assert.equal(saved, path.join(home, '.cache', 'opendeck-hub', 'backup', 'com.miwoli.x.sdPlugin-stamp'));
     assert.deepEqual(await readdir(saved), ['manifest.json']);
     await assert.rejects(readdir(dest));
+  }));
+
+test('the same plugin in two targets gets two separate backups', () =>
+  withTemp(async (home) => {
+    const name = 'com.miwoli.x.sdPlugin';
+    const saved = [];
+    for (const which of ['native', 'flatpak']) {
+      const dest = path.join(home, which, name);
+      await mkdir(dest, { recursive: true });
+      await writeFile(path.join(dest, `${which}.txt`), which);
+      saved.push(await backup(dest, name, 'stamp', home));
+    }
+    assert.notEqual(saved[0], saved[1]);
+    assert.deepEqual(await readdir(saved[0]), ['native.txt']);
+    assert.deepEqual(await readdir(saved[1]), ['flatpak.txt']);
+  }));
+
+test('a failed move (not EXDEV) keeps the original', { skip: process.getuid?.() === 0 && 'root ignores permissions' }, () =>
+  withTemp(async (home) => {
+    const dest = path.join(home, 'plugins', 'com.miwoli.x.sdPlugin');
+    await mkdir(dest, { recursive: true });
+    await writeFile(path.join(dest, 'manifest.json'), '{}');
+    const backupRoot = path.join(home, '.cache', 'opendeck-hub', 'backup');
+    await mkdir(backupRoot, { recursive: true });
+    await chmod(backupRoot, 0o500);
+    try {
+      await assert.rejects(backup(dest, 'com.miwoli.x.sdPlugin', 'stamp', home), { code: 'EACCES' });
+    } finally {
+      await chmod(backupRoot, 0o700);
+    }
+    assert.deepEqual(await readdir(dest), ['manifest.json']);
   }));

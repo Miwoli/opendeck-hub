@@ -49,16 +49,21 @@ export function selectPlugins(plugins, filter) {
   return plugins.filter((p) => filter.includes(p.name));
 }
 
-// Moves dest to ~/.cache/opendeck-hub/backup/<dirName>-<stamp>, never deletes it. Returns the backup path.
+// Moves dest to ~/.cache/opendeck-hub/backup/<dirName>-<stamp>[-n], never deletes it. Returns the backup path.
+// The -n suffix keeps one backup per target when native and Flatpak hold the same plugin in one run.
 export async function backup(dest, dirName, stamp, home = os.homedir()) {
   const backupRoot = path.join(home, '.cache', 'opendeck-hub', 'backup');
   await mkdir(backupRoot, { recursive: true });
-  const target = path.join(backupRoot, `${dirName}-${stamp}`);
-  await rename(dest, target).catch(async () => {
-    // rename fails across filesystems; copy, then remove the original
-    await cp(dest, target, { recursive: true });
+  let target = path.join(backupRoot, `${dirName}-${stamp}`);
+  for (let n = 1; await exists(target); n++) target = path.join(backupRoot, `${dirName}-${stamp}-${n}`);
+  try {
+    await rename(dest, target);
+  } catch (err) {
+    if (err.code !== 'EXDEV') throw err;
+    // across filesystems: copy (never into an existing dir), then remove the original
+    await cp(dest, target, { recursive: true, force: false, errorOnExist: true });
     await rm(dest, { recursive: true, force: true });
-  });
+  }
   return target;
 }
 
