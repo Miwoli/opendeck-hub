@@ -3,14 +3,14 @@
 // never deleted. OpenDeck must be restarted afterwards. The recommended install path is still `npm run pack`
 // + OpenDeck "Install from file"; this script is for quick iteration.
 //
-// From the repo root:   node scripts/install-plugin.mjs [<plugin>...]   builds and installs all (or the named) plugins
+// From the repo root:   node scripts/install-plugin.mjs [<plugin>...]   builds and installs the released (or the named) plugins
 // From plugins/<name>:  node ../../scripts/install-plugin.mjs           installs that plugin (its npm script builds first)
 
 import { execFileSync } from 'node:child_process';
 import { cp } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { backup, exists, pluginTargets, printRestartHint, repoPlugins, selectPlugins, timestamp } from './lib/opendeck.mjs';
+import { backup, exists, pluginTargets, printRestartHint, releasedPlugins, repoPlugins, selectPlugins, timestamp } from './lib/opendeck.mjs';
 import { fail, findPlugin } from './lib/plugin.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -18,7 +18,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 async function main() {
   let plugins;
   if (path.resolve(process.cwd()) === repoRoot) {
-    plugins = selectPlugins(await repoPlugins(repoRoot), process.argv.slice(2));
+    plugins = selectPlugins(await repoPlugins(repoRoot), process.argv.slice(2), await releasedPlugins(repoRoot));
     const workspaces = plugins.flatMap((p) => ['-w', `plugins/${p.name}`]);
     execFileSync('npm', ['run', 'build', ...workspaces], { cwd: repoRoot, stdio: 'inherit', timeout: 10 * 60_000 });
   } else {

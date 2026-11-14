@@ -1,7 +1,7 @@
 // Helpers for installing into a local OpenDeck: finding its plugin directory, listing this repo's
 // plugins and moving an old copy to the backup folder. Used by install-plugin.mjs and uninstall-plugin.mjs.
 
-import { cp, mkdir, readdir, rename, rm, stat } from 'node:fs/promises';
+import { cp, mkdir, readdir, readFile, rename, rm, stat } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { findPlugin } from './plugin.mjs';
@@ -41,9 +41,15 @@ export async function repoPlugins(repoRoot) {
   return plugins.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-// No filter = all plugins; an unknown name is an error rather than a silent no-op.
-export function selectPlugins(plugins, filter) {
-  if (filter.length === 0) return plugins;
+// Names of the plugins release-please releases (dev-preview is left out there on purpose).
+export async function releasedPlugins(repoRoot) {
+  const config = JSON.parse(await readFile(path.join(repoRoot, 'release-please-config.json'), 'utf8'));
+  return Object.keys(config.packages ?? {}).map((p) => path.basename(p));
+}
+
+// No filter = all plugins, or only `defaults` when given; an unknown name is an error rather than a silent no-op.
+export function selectPlugins(plugins, filter, defaults) {
+  if (filter.length === 0) return defaults ? plugins.filter((p) => defaults.includes(p.name)) : plugins;
   const unknown = filter.filter((n) => !plugins.some((p) => p.name === n));
   if (unknown.length) throw new Error(`Unknown plugin(s): ${unknown.join(', ')}. Available: ${plugins.map((p) => p.name).join(', ')}`);
   return plugins.filter((p) => filter.includes(p.name));

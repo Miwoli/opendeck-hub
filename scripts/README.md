@@ -4,7 +4,7 @@ is detected by its single `*.sdPlugin` directory.
 | Script | npm | What it does |
 |---|---|---|
 | `build-plugin.mjs [--watch]` | `build`, `watch` | esbuild `src/index.ts` -> `<uuid>.sdPlugin/bin/plugin.cjs` (`cjs`, node20); copies `pi/` |
-| `install-plugin.mjs [<plugin>...]` | `install-plugin` (root and per plugin) | from the root: builds and installs all (or the named) plugins; from a plugin: installs that one. Copies `<uuid>.sdPlugin` to `~/.config/opendeck/plugins/` and any OpenDeck Flatpak directory, or only `OPENDECK_PLUGINS_DIR`; MOVES the previous copy to `~/.cache/opendeck-hub/backup/` |
+| `install-plugin.mjs [<plugin>...]` | `install-plugin` (root and per plugin) | from the root: builds and installs the plugins listed in `release-please-config.json` (so not `dev-preview`), or the named ones; from a plugin: installs that one. Copies `<uuid>.sdPlugin` to `~/.config/opendeck/plugins/` and any OpenDeck Flatpak directory, or only `OPENDECK_PLUGINS_DIR`; MOVES the previous copy to `~/.cache/opendeck-hub/backup/` |
 | `uninstall-plugin.mjs [<plugin>...]` | `uninstall-plugin` (root) | moves this repo's plugins (only `<uuid>.sdPlugin` names from `plugins/`) out of the same directories into the backup folder |
 | `pack-plugin.mjs` | `pack` | `dist/<uuid>-<version>.streamDeckPlugin` (ZIP) for "Install from file" + `.sha256` (sha256sum format) |
 | `check-versions.mjs [<plugin>-v<semver>]` | `check-versions` (root) | manifest `Version` must equal `package.json` version + `.0`; with a tag also checks the tag. Run from the repo root |

@@ -3,7 +3,7 @@ import { chmod, mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
-import { backup, pluginTargets, repoPlugins, selectPlugins } from '../lib/opendeck.mjs';
+import { backup, pluginTargets, releasedPlugins, repoPlugins, selectPlugins } from '../lib/opendeck.mjs';
 
 async function withTemp(fn) {
   const dir = await mkdtemp(path.join(tmpdir(), 'opendeck-'));
@@ -38,8 +38,16 @@ test('lists repo plugins and filters them by name', () =>
     const plugins = await repoPlugins(root);
     assert.deepEqual(plugins.map((p) => p.dirName), ['com.miwoli.alpha.sdPlugin', 'com.miwoli.beta.sdPlugin']);
     assert.equal(selectPlugins(plugins, []).length, 2);
+    assert.deepEqual(selectPlugins(plugins, [], ['alpha']).map((p) => p.name), ['alpha'], 'no names: only defaults');
+    assert.deepEqual(selectPlugins(plugins, ['beta'], ['alpha']).map((p) => p.name), ['beta'], 'a named plugin beats defaults');
     assert.deepEqual(selectPlugins(plugins, ['beta']).map((p) => p.name), ['beta']);
     assert.throws(() => selectPlugins(plugins, ['beta', 'nope']), /Unknown plugin\(s\): nope/);
+  }));
+
+test('released plugins come from the release-please config', () =>
+  withTemp(async (root) => {
+    await writeFile(path.join(root, 'release-please-config.json'), '{"packages":{"plugins/alpha":{},"plugins/ha-map":{}}}');
+    assert.deepEqual(await releasedPlugins(root), ['alpha', 'ha-map']);
   }));
 
 test('backup moves the old copy instead of deleting it', () =>

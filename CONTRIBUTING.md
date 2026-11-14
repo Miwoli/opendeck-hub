@@ -38,7 +38,7 @@ Other useful commands:
 npm run build                                # build every plugin
 npm run preview                              # render all tile states to dist/preview/index.html
 npm run build -w plugins/<name>              # build one plugin
-npm run install-plugin                       # build every plugin and copy it into OpenDeck
+npm run install-plugin                       # build every released plugin (not dev-preview) and copy it into OpenDeck
 npm run install-plugin -- <name> [<name>...] # only these plugins
 npm run uninstall-plugin [-- <name>...]      # remove this repo's plugins from OpenDeck
 npm run pack -w plugins/<name>               # create a .streamDeckPlugin archive
