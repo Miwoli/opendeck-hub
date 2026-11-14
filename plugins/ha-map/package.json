@@ -1,6 +1,6 @@
 {
   "name": "com.miwoli.ha-map",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "OpenDeck plugin: an OSM map of the people in Home Assistant spread over a 5x3 deck, plus keys with each person's distance from home.",
   "license": "MIT",
