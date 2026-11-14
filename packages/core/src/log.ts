@@ -7,6 +7,11 @@ export interface Logger {
   error(message: string, ...details: unknown[]): void;
 }
 
+/** Masks `user:password@` in URLs: error messages (e.g. fetch's "URL includes credentials") can echo the full URL. */
+export function redactUrlCredentials(text: string): string {
+  return text.replace(/(\/\/)[^/\s@]+@/g, '$1***@');
+}
+
 function describe(detail: unknown): string {
   if (detail instanceof Error) return detail.stack ?? detail.message;
   if (typeof detail === 'string') return detail;
@@ -19,7 +24,7 @@ function describe(detail: unknown): string {
 
 export function createLogger(tag: string): Logger {
   const line = (level: string, message: string, details: unknown[]): string =>
-    [`${new Date().toISOString()} [${tag}] [${level}] ${message}`, ...details.map(describe)].join(' ');
+    redactUrlCredentials([`${new Date().toISOString()} [${tag}] [${level}] ${message}`, ...details.map(describe)].join(' '));
   return {
     info: (m, ...d) => console.log(line('info', m, d)),
     warn: (m, ...d) => console.warn(line('warn', m, d)),

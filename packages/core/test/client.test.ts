@@ -242,3 +242,19 @@ describe('OpenActionClient', () => {
     assert.ok(gaveUp);
   });
 });
+
+describe('log redaction', () => {
+  it('masks URL credentials in log lines, including error messages', async () => {
+    const { createLogger, redactUrlCredentials } = await import('../src/log.ts');
+    assert.equal(redactUrlCredentials('GET https://user:pw@ha.local:8123/x and http://plain.host/y'), 'GET https://***@ha.local:8123/x and http://plain.host/y');
+    const lines: string[] = [];
+    const orig = console.error;
+    console.error = (l: string) => void lines.push(l);
+    try {
+      createLogger('t').error('fetch failed', new TypeError('URL includes credentials: https://u:secret@h/p'));
+    } finally {
+      console.error = orig;
+    }
+    assert.ok(lines[0] && !lines[0].includes('secret') && lines[0].includes('https://***@h/p'));
+  });
+});
