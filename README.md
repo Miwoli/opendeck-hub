@@ -43,6 +43,12 @@ Every image above is generated from the plugins' own tile code (`npm run readme-
 
 Each plugin's README covers its setup and settings.
 
+**From source:** with Node.js 22.18 or newer, `npm install` and then `npm run install-plugin` builds every plugin and
+copies it into OpenDeck's plugin directory (native or Flatpak, detected automatically). Name plugins to install only
+those (`npm run install-plugin -- games media`), set `OPENDECK_PLUGINS_DIR` to use another directory, and remove them
+again with `npm run uninstall-plugin`. A replaced or removed copy is moved to `~/.cache/opendeck-hub/backup/`. Restart
+OpenDeck afterwards.
+
 **Requirements:** Linux with OpenDeck (native package or Flatpak) and a Stream Deck with keys. Only the `Keypad` controller
 is supported (no dials or touch strips).
 

@@ -38,11 +38,15 @@ Other useful commands:
 npm run build                                # build every plugin
 npm run preview                              # render all tile states to dist/preview/index.html
 npm run build -w plugins/<name>              # build one plugin
-npm run install-plugin -w plugins/<name>     # build and copy it into OpenDeck
+npm run install-plugin                       # build every plugin and copy it into OpenDeck
+npm run install-plugin -- <name> [<name>...] # only these plugins
+npm run uninstall-plugin [-- <name>...]      # remove this repo's plugins from OpenDeck
 npm run pack -w plugins/<name>               # create a .streamDeckPlugin archive
 ```
 
-After installing a plugin, restart OpenDeck and check the plugin log for errors. Each plugin's README describes its
+The plugin directory is detected (`~/.config/opendeck/plugins/` and any OpenDeck Flatpak under `~/.var/app/`); set
+`OPENDECK_PLUGINS_DIR` to install somewhere else, for example a temporary directory. A copy that is replaced or removed
+is moved to `~/.cache/opendeck-hub/backup/`, never deleted. After installing a plugin, restart OpenDeck and check the plugin log for errors. Each plugin's README describes its
 settings and troubleshooting steps.
 
 ## Adding a plugin
