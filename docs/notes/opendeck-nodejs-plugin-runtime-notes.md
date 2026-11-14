@@ -2,6 +2,11 @@
 
 Verified on a live OpenDeck while debugging a plugin that showed no data.
 
+**Checked against:** OpenDeck 2.14.0 (native, Arch AUR `opendeck-bin`). The Node start-up path was re-read in
+[`nekename/OpenDeck@3ddecc1`](https://github.com/nekename/OpenDeck/blob/3ddecc1/src-tauri/src/plugins/mod.rs#L248-L253)
+(v2.14.2) on 2026-11-14: plugins run with `node` (Flatpak: `flatpak-spawn --host node`), Node.js >= 20.0.0. The Flatpak
+paths below have not been tried live.
+
 ## Where to look for logs
 - Main OpenDeck log: `~/.local/share/opendeck/logs/opendeck.log` (manifest parse errors, among other things).
 - Plugin log (stdout/stderr of the Node process): `~/.local/share/opendeck/logs/plugins/<plugin UUID>.sdPlugin.log` -

@@ -3,6 +3,9 @@
 Verified directly in the `nekename/OpenDeck` sources (`src-tauri/src/plugins/manifest.rs`, `src-tauri/src/shared.rs`) while
 debugging a "Failed to parse manifest" error on install.
 
+**Checked against:** [`nekename/OpenDeck@3ddecc1`](https://github.com/nekename/OpenDeck/blob/3ddecc1/src-tauri/src/plugins/manifest.rs)
+(v2.14.2), re-checked 2026-11-14. Live installs on OpenDeck 2.14.0 (native).
+
 ## `PluginManifest` (top-level fields)
 
 Deserialised by serde with PascalCase aliases (each field has its own `#[serde(alias = "...")]`) and **without**
