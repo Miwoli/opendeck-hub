@@ -1,6 +1,6 @@
 {
   "plugins/claude-usage": "0.2.0",
-  "plugins/discord": "0.1.0",
+  "plugins/discord": "0.1.1",
   "plugins/displays": "0.1.0",
   "plugins/games": "0.2.0",
   "plugins/ha-map": "0.2.1",
