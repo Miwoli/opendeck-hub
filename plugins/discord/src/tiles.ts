@@ -6,7 +6,7 @@ import type { DiscordState } from './bridge.ts';
 
 export function micTile(state: DiscordState | null): IconTileSpec {
   if (!state) return { template: 'icon', tone: 'offline', glyph: 'mic', name: 'Mic', status: 'offline' };
-  if (state.serverMute) return { template: 'icon', tone: 'alert', glyph: 'micOff', name: 'Mic', status: 'Serwer' };
+  if (state.serverMute) return { template: 'icon', tone: 'alert', glyph: 'micOff', name: 'Mic', status: 'Server' };
   // deafen implies mute in Discord
   if (state.selfMute || state.selfDeaf) return { template: 'icon', tone: 'alert', glyph: 'micOff', name: 'Mic', status: 'Muted' };
   return { template: 'icon', glyph: 'mic', name: 'Mic', status: 'On', statusTone: 'ok' };
@@ -14,7 +14,7 @@ export function micTile(state: DiscordState | null): IconTileSpec {
 
 export function headphonesTile(state: DiscordState | null): IconTileSpec {
   if (!state) return { template: 'icon', tone: 'offline', glyph: 'headphones', name: 'Headphones', status: 'offline' };
-  if (state.serverDeaf) return { template: 'icon', tone: 'alert', glyph: 'headphonesOff', name: 'Headphones', status: 'Serwer' };
+  if (state.serverDeaf) return { template: 'icon', tone: 'alert', glyph: 'headphonesOff', name: 'Headphones', status: 'Server' };
   if (state.selfDeaf) return { template: 'icon', tone: 'alert', glyph: 'headphonesOff', name: 'Headphones', status: 'Muted' };
   return { template: 'icon', glyph: 'headphones', name: 'Headphones', status: 'On', statusTone: 'ok' };
 }
