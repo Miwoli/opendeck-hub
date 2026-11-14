@@ -1,0 +1,39 @@
+name: Feature request
+description: Suggest an improvement or a new plugin
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Please do not include personal data, tokens or credentials.
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Plugin
+      options:
+        - claude-usage
+        - discord
+        - displays
+        - games
+        - ha-map
+        - homeassistant
+        - media
+        - system
+        - new plugin
+        - repo / tooling
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Remember the target is a 5x3 grid of 72x72 px keys, no dials or touch strips.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

@@ -1,0 +1,65 @@
+name: Bug report
+description: Something in a plugin does not work as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Security problem? Do not file it here, see [SECURITY.md](https://github.com/Miwoli/opendeck-hub/blob/main/SECURITY.md).
+
+        **Do not include personal data.** Before pasting logs or settings, remove tokens, cookies (`sessionKey`), Home Assistant
+        long-lived tokens, URLs that contain credentials, and your home path (replace `/home/<you>` with `~`).
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Plugin
+      options:
+        - claude-usage
+        - discord
+        - displays
+        - games
+        - ha-map
+        - homeassistant
+        - media
+        - system
+        - other / not sure
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: From the release you installed (for example `0.2.1`) or the `Version` in its `manifest.json`.
+    validations:
+      required: true
+  - type: input
+    id: opendeck-version
+    attributes:
+      label: OpenDeck version
+      description: Shown in OpenDeck's About dialog or the release you installed.
+    validations:
+      required: true
+  - type: dropdown
+    id: install-type
+    attributes:
+      label: OpenDeck install type
+      options:
+        - Native (distro package, AppImage or built from source)
+        - Flatpak
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened, and what did you expect?
+      description: Include steps to reproduce.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log excerpt
+      description: |
+        Relevant lines from `~/.local/share/opendeck/logs/opendeck.log` and `~/.local/share/opendeck/logs/plugins/<UUID>.sdPlugin.log`
+        (Flatpak: under `~/.var/app/`). Redact secrets and home paths first.
+      render: text
