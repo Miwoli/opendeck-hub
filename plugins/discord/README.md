@@ -44,6 +44,17 @@ warning. State is shared by all tiles on all pages.
 To go back to the regular Vencord: Developer Options → Vencord Location → reset. Updating Vencord means running
 `npm run vencord` again (a custom location disables Vesktop's automatic updates).
 
+## Security and secrets
+
+- **Secrets:** none stored. The plugin has no accounts, tokens or network access.
+- **DeckBridge:** the [Vencord userplugin](vencord-userplugin) runs inside Vesktop and opens a Unix socket,
+  `$XDG_RUNTIME_DIR/opendeck-discord.sock` (fallback `/tmp/opendeck-<uid>/`), with mode `0600`, so only your user can use it.
+  It publishes your own mute / deafen / push-to-talk state and accepts only a fixed set of commands (toggle mute, toggle
+  deafen, push-to-talk, get state). It never exposes messages, tokens or Discord data.
+- **Access needed:** a modified Vesktop client (a userplugin is third-party code running with the client's rights; it is
+  GPL-3.0 and small enough to audit). Using client mods may go against Discord's terms; that is your decision.
+- **Logs:** only the mute / deafen state and the socket path.
+
 ## Troubleshooting
 
 - **DeckBridge missing from the plugin list?** Check that `dist/` was not overwritten with the official Vencord:

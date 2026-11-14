@@ -34,6 +34,13 @@ Download `com.miwoli.system.sdPlugin-<version>.streamDeckPlugin` from the
   `Screenshot_YYYYMMDD_HHMMSS.png`. An error shows an "error" tile and an OpenDeck warning.
 - All commands use `execFile` with an argument array and a timeout.
 
+## Security and secrets
+
+- **Secrets:** none stored. No network, accounts or tokens.
+- **Access needed:** runs `systemctl poweroff` (after the hold-to-confirm) and Spectacle as your user, with argument
+  arrays and no shell. It reads `~/.config/user-dirs.dirs` for the Pictures folder and writes screenshots there. A
+  screenshot can contain anything visible on your screen; the log contains only the file path.
+
 ## Troubleshooting
 
 - **Logs:** `~/.local/share/opendeck/logs/plugins/com.miwoli.system.sdPlugin.log` (`power off confirmed`, `screenshot saved: …`).

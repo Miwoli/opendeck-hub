@@ -49,6 +49,13 @@ Commands use `execFile` without a shell, for example for "Screen 2":
 `kscreen-doctor output.HDMI-1.enable output.HDMI-1.priority.1 output.DP-1.disable`. `kscreen-doctor -j` is polled every
 5 s, only while a tile is visible.
 
+## Security and secrets
+
+- **Secrets:** none. No network, accounts or tokens.
+- **Stores:** the last extended layout (output names, positions, modes) in the plugin's global settings,
+  `~/.config/opendeck/settings/com.miwoli.displays.sdPlugin.json`.
+- **Access needed:** runs `kscreen-doctor` (KDE) as your user, with an argument array and no shell; no root.
+
 ## Troubleshooting
 
 - **Logs:** `~/.local/share/opendeck/logs/plugins/com.miwoli.displays.sdPlugin.log`: `apply {...}: kscreen-doctor …`,

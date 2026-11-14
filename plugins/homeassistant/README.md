@@ -42,6 +42,19 @@ the [install steps](../../README.md#install). Needs a Home Assistant server and 
 - Pickers are `<select>` elements rather than a `<datalist>`: a large, periodically rebuilt datalist froze OpenDeck (see
   [`docs/notes/opendeck-profile-switching-notes.md`](../../docs/notes/opendeck-profile-switching-notes.md)).
 
+## Security and secrets
+
+- **Secret:** a Home Assistant long-lived access token (it has the full rights of the user who created it, Home Assistant
+  cannot limit it further; use a dedicated non-admin user).
+- **Stored in:** the plugin's global settings, `~/.config/opendeck/settings/com.miwoli.homeassistant.sdPlugin.json` (plain
+  JSON written by OpenDeck, together with the URL). The Property Inspector never receives the token back, and the log never
+  contains it. The "Use the URL and token from HA Map" button reads `com.miwoli.ha-map`'s settings file (same user, local).
+- **Sent to:** only the Home Assistant URL you entered (WebSocket `/api/websocket`). Prefer `https://`: a plain `http://`
+  connection sends the token unencrypted.
+- **Access needed:** read of entity states, and calling `homeassistant.toggle` on the selected light / switch.
+- **Tip:** the settings file is readable by your user; `chmod 600` it if the machine is shared. Revoke the token in Home
+  Assistant (profile → Security) if it leaks.
+
 ## Troubleshooting
 
 - **Logs:** `~/.local/share/opendeck/logs/plugins/com.miwoli.homeassistant.sdPlugin.log` (`Home Assistant: connected`, `toggle …`).
