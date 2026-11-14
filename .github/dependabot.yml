@@ -1,0 +1,47 @@
+# Dependabot version updates. Weekly, minor and patch updates are grouped to limit PR noise.
+# Major updates are never grouped, so each one arrives as its own PR for separate review.
+# Commit prefixes are Conventional Commits that release-please does not release on
+# (only feat and fix do), so dependency bumps do not cut plugin releases.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    # npm workspaces share the single root package-lock.json, so one entry covers every plugin and package.
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"   # produces "chore(deps): ..."
+    groups:
+      # Toolchain packages that must keep bundles CJS and Node 20 compatible: review them on their own.
+      npm-toolchain:
+        patterns:
+          - "esbuild"
+          - "ws"
+          - "sharp"
+          - "typescript"
+        update-types:
+          - "minor"
+          - "patch"
+      npm-minor-and-patch:
+        exclude-patterns:
+          - "esbuild"
+          - "ws"
+          - "sharp"
+          - "typescript"
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+      include: "scope"   # produces "ci(deps): ..."
+    groups:
+      github-actions-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
