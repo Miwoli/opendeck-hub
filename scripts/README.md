@@ -9,5 +9,6 @@ is detected by its single `*.sdPlugin` directory.
 | `check-versions.mjs [<plugin>-v<semver>]` | `check-versions` (root) | manifest `Version` must equal `package.json` version + `.0`; with a tag also checks the tag. Run from the repo root |
 | `check-manifests.mjs` | `check-manifests` (root) | every `plugins/*/*.sdPlugin/manifest.json` against the CLAUDE.md hard rules (required fields, `OS`, forbidden fields, `Controllers`, UUIDs); reports all problems, exit 1. Run from the repo root |
 | `smoke-plugin.mjs` | `smoke` | bundle test without OpenDeck: starts with `-port 1`, expects `ECONNREFUSED` |
+| `new-plugin.mjs <name>` | `new-plugin` (root) | generates `plugins/<name>/` from `templates/plugin` (`__NAME__` / `__TITLE__` placeholders) and registers it in the release-please files; refuses invalid or existing names. Run from the repo root |
 
 `lib/zip.mjs` is a minimal ZIP writer (fs + zlib). Icon generation (`scripts/build-icons.ts`, sharp) stays per plugin.

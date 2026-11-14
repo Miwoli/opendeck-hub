@@ -1,0 +1,31 @@
+{
+  "Name": "__TITLE__",
+  "Author": "Miwoli",
+  "Version": "0.1.0.0",
+  "Icon": "images/pluginIcon",
+  "Category": "__TITLE__",
+  "CategoryIcon": "images/pluginCategory",
+  "OS": [
+    {
+      "Platform": "linux"
+    }
+  ],
+  "CodePathLin": "bin/plugin.cjs",
+  "Actions": [
+    {
+      "UUID": "com.miwoli.__NAME__.hello",
+      "Name": "Hello",
+      "Tooltip": "Sample key: counts presses. Replace it with your own action",
+      "Icon": "images/actionHello",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "images/keyHello",
+          "ShowTitle": false
+        }
+      ]
+    }
+  ]
+}

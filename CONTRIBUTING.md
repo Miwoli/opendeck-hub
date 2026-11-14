@@ -45,6 +45,25 @@ npm run pack -w plugins/<name>               # create a .streamDeckPlugin archiv
 After installing a plugin, restart OpenDeck and check the plugin log for errors. Each plugin's README describes its
 settings and troubleshooting steps.
 
+## Adding a plugin
+
+```bash
+npm run new-plugin -- <name>     # lowercase letters, digits and hyphens, e.g. "my-plugin"
+npm install                      # registers the new workspace; commit the package-lock.json change
+npm test -w plugins/<name>
+```
+
+This copies `scripts/templates/plugin` to `plugins/<name>/` (manifest with the right UUIDs, `OS` and `Controllers`,
+esbuild CJS build, icon script, one sample action, a test, a README and a changelog) and adds the plugin to
+`release-please-config.json` and `.release-please-manifest.json`. It never overwrites an existing plugin. The result
+already passes `npm run check-manifests`, `npm run check-versions` and the bundle smoke test.
+
+Then:
+
+1. Replace the sample `hello` action (and rename its UUID, the manifest entry and the icons) with your own, and fill in the `TODO`s in the README.
+2. Add a row to the plugin table in the root `README.md` and a tile strip for it: add the plugin's tiles to
+   `scripts/readme-images/tiles.ts` and run `npm run readme-images`.
+
 ## Making a change
 
 1. Fork the repository and create a branch from an up-to-date `main`. Nothing is committed to `main` directly; every
