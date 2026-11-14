@@ -12,6 +12,10 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"   # produces "chore(deps): ..."
+    ignore:
+      # @types/node must match the Node versions we target (engines >= 22, bundles Node 20), not the newest Node.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       # Toolchain packages that must keep bundles CJS and Node 20 compatible: review them on their own.
       npm-toolchain:
