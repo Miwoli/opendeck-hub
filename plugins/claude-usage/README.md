@@ -44,6 +44,19 @@ the [install steps](../../README.md#install).
 2. Paste your `sessionKey` (browser DevTools → Application → Cookies → claude.ai → `sessionKey`, starts with `sk-ant-`) and
    save. Settings are shared by both keys.
 
+## Security and secrets
+
+- **Secret:** the claude.ai `sessionKey` cookie, which is a login to your Claude account. Treat it like a password.
+- **Stored in:** the plugin's global settings, `~/.config/opendeck/settings/com.miwoli.claude-usage.sdPlugin.json` (plain JSON
+  written by OpenDeck; also the cached organization id and refresh interval). The Property Inspector (a password field)
+  reads it back from OpenDeck.
+- **Sent to:** only `https://claude.ai` (`/api/organizations` and `/api/organizations/<id>/usage`), as the `Cookie` header.
+  Nothing else is contacted and there is no telemetry.
+- **Access needed:** the same as the logged-in website session: it can read your usage, but the key also works for anything
+  else your session can do on claude.ai. Log out of claude.ai (or sign out all sessions) to revoke it.
+- **Logs:** never contain the key; errors log only a category and an HTTP status.
+- **Tip:** the settings file is readable by your user; check `ls -l` and `chmod 600` it if other people use the machine.
+
 ## Troubleshooting
 
 - **A key stays empty:** usually a missing or expired `sessionKey`.

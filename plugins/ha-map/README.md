@@ -68,14 +68,22 @@ details in the Property Inspector), a memory and disk cache (`~/.cache/opendeck-
 downloads and no retry loop after an error (15 s pause). The "© OpenStreetMap" attribution is drawn on the map. This is fine
 for use by one person; with very frequent refreshes consider your own tile server (URL template in the PI).
 
-### Privacy and security
+## Security and secrets
 
-- No accounts, cloud or telemetry: the plugin talks only to your Home Assistant and the tile server. The tile server sees
-  which **area** you view (tiles around the positions) but not who the people are.
-- OpenDeck stores the Home Assistant token in `~/.config/opendeck/settings/com.miwoli.ha-map.sdPlugin.json` (plain text). Use a
-  token of an account with minimal rights (the plugin only reads `person.*` and `zone.*` states).
-- A plain `http://` connection to Home Assistant on a local network is unencrypted; for remote access use `https://` (the
-  certificate must be trusted by Node).
+- **Secret:** a Home Assistant long-lived access token (it has the full rights of the user who created it, Home Assistant
+  cannot limit it further; use a dedicated non-admin user. The plugin itself only reads `person.*` and `zone.*` states).
+- **Stored in:** the plugin's global settings, `~/.config/opendeck/settings/com.miwoli.ha-map.sdPlugin.json` (plain JSON
+  written by OpenDeck, together with the URL, tile URL and User-Agent). The Property Inspector reads it back from OpenDeck.
+  The `homeassistant` plugin can copy it from there when you press its import button.
+- **Sent to:** your Home Assistant URL (WebSocket, and the token as a `Bearer` header for avatar pictures of the same
+  origin only), and the map tile server. The tile server sees which area you view, not who the people are. Do not put
+  secrets in a custom tile URL if you share logs.
+- **Access needed:** read-only use of states. No accounts, cloud or telemetry. Tiles are cached in `~/.cache/opendeck-ha-map/`
+  (map images only).
+- **Plain `http://`** to Home Assistant is unencrypted; for remote access use `https://` (the certificate must be trusted
+  by Node).
+- **Logs:** never contain the token; credentials embedded in a URL (`https://user:pass@host`) are masked.
+- **Tip:** the settings file is readable by your user; `chmod 600` it if the machine is shared.
 
 ## Troubleshooting
 

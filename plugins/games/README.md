@@ -45,6 +45,16 @@ detached. The Library key runs `steam steam://open/games` or `lutris`.
 **Close game** recognises the game by the `reaper SteamLaunch AppId=<id>` process (Steam) or `lutris-wrapper` (Lutris) and
 signals only their descendants.
 
+## Security and secrets
+
+- **Secrets:** none stored. No network, accounts or tokens (Steam and Lutris logins are never read).
+- **Reads (read-only):** Steam's `libraryfolders.vdf`, `appmanifest_*.acf`, `userdata/<id>/config/localconfig.vdf` (last played),
+  `userdata/<id>/config/cloudstorage` and `appcache/librarycache` covers under `~/.local/share/Steam`; Lutris's `pga.db` and
+  covers under `~/.local/share/lutris`; and `/proc` to find the running game. Account files in `userdata` are read only for
+  play times and are never logged or sent anywhere.
+- **Access needed:** starts `steam` or `lutris` as your user (`steam://rungameid/<id>`, `lutris:rungameid/<id>`) and sends
+  SIGTERM / SIGKILL to the processes of the game you close. The launch command is logged; it contains only a game id.
+
 ## Troubleshooting
 
 - **Close game keeps saying "no game" while a game runs.** The process markers are well known but have not been observed on

@@ -42,6 +42,15 @@ Download `com.miwoli.media.sdPlugin-<version>.streamDeckPlugin` from the
   `~/.cache/opendeck-hub/covers`.
 - **Privacy:** the log contains only the list of players and their state, never titles or URLs.
 
+## Security and secrets
+
+- **Secrets:** none stored. No accounts or tokens.
+- **Access needed:** the user D-Bus session (`busctl --user`) to read and control MPRIS players; no root.
+- **Network:** none by default. Only after you enable remote covers (global setting `allowRemoteArt`) it downloads the cover
+  URL a player advertises (for example Spotify's `i.scdn.co`), so that server learns your IP. Covers are cached as images in
+  `~/.cache/opendeck-hub/covers`.
+- **Logs:** player names and state only, never titles or URLs.
+
 ## Troubleshooting
 
 - **Logs:** `~/.local/share/opendeck/logs/plugins/com.miwoli.media.sdPlugin.log` (`players: Spotify:Playing, …`, `switched to Firefox`).
