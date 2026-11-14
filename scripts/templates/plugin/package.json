@@ -1,0 +1,21 @@
+{
+  "name": "com.miwoli.__NAME__",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenDeck plugin: __TITLE__.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-icons.ts && node ../../scripts/build-plugin.mjs",
+    "watch": "node ../../scripts/build-plugin.mjs --watch",
+    "install-plugin": "npm run build && node ../../scripts/install-plugin.mjs",
+    "pack": "npm run build && node ../../scripts/pack-plugin.mjs",
+    "typecheck": "tsc --noEmit",
+    "smoke": "node ../../scripts/smoke-plugin.mjs",
+    "test": "node ../../scripts/build-plugin.mjs && node --test 'test/**/*.test.ts' && node ../../scripts/smoke-plugin.mjs"
+  },
+  "dependencies": {
+    "@miwoli/deck-core": "*",
+    "ws": "^8.18.0"
+  }
+}

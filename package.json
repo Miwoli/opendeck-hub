@@ -17,6 +17,7 @@
     "test": "node --test 'scripts/test/*.test.mjs' && npm test --workspaces --if-present",
     "check-versions": "node scripts/check-versions.mjs",
     "check-manifests": "node scripts/check-manifests.mjs",
+    "new-plugin": "node scripts/new-plugin.mjs",
     "preview": "npm run preview -w packages/core",
     "readme-images": "node scripts/readme-images/render.mjs",
     "smoke": "npm run smoke --workspaces --if-present"
