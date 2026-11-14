@@ -3,6 +3,9 @@
 Read from `nekename/OpenDeck` @3ddecc1 (`src/lib/rendererHelper.ts`, `src-tauri/src/elgato.rs`) and the
 `elgato-streamdeck` 0.14 crate, then confirmed on a first-generation Stream Deck.
 
+**Checked against:** [`nekename/OpenDeck@3ddecc1`](https://github.com/nekename/OpenDeck/blob/3ddecc1/src/lib/rendererHelper.ts)
+(v2.14.2) for the code; the device tests ran on OpenDeck 2.14.0 (native).
+
 ## Pipeline
 1. The `data:` URI from `setImage` becomes an `<img>` in the webview (WebKitGTK, Tauri).
 2. It is drawn onto a **144x144** canvas (`drawImage` over the whole key; the state's `image_scale` applies).

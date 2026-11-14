@@ -4,6 +4,9 @@ Verified in the `nekename/OpenDeck` sources (`src-tauri/src/events/inbound/mod.r
 `frontend/profiles.rs`, `outbound/mod.rs`, `outbound/keypad.rs`, `inbound/states.rs`, `store/profiles.rs`,
 `src/components/Key.svelte`, `plugins/com.amansprojects.starterpack.sdPlugin/src/switch_profile.rs`).
 
+**Checked against:** [`nekename/OpenDeck@3ddecc1`](https://github.com/nekename/OpenDeck/tree/3ddecc1) (v2.14.2),
+re-checked 2026-11-14. Behaviour seen live (the Property Inspector freeze, context reuse) was on OpenDeck 2.14.0 (native).
+
 ## Can a custom plugin switch the profile? No
 - The `switchProfile` event (`{event, device, profile}`) is silently dropped for every plugin except
   `com.amansprojects.starterpack.sdPlugin` and `opendeck_alternative_elgato_implementation`.

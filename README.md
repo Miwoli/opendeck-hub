@@ -54,6 +54,26 @@ is supported (no dials or touch strips).
 - **Tile style:** every plugin draws its keys with one shared renderer, so colours always mean the same thing.
   See [`docs/tile-design.md`](docs/tile-design.md).
 
+## Compatibility
+
+| OpenDeck | Install type | Status |
+|---|---|---|
+| 2.14.0 | Native (Arch AUR `opendeck-bin`) | Tested on a first-generation Stream Deck |
+| 2.14.2 ([`3ddecc1`](https://github.com/nekename/OpenDeck/tree/3ddecc1)) | n/a | Source the [OpenDeck notes](docs/notes/) were checked against; not run live |
+| Any | Flatpak | Not tested. The code paths exist (see below), but nobody has run these plugins under Flatpak yet |
+| Older than 2.14 | Any | Not tested |
+
+Each note in [`docs/notes/`](docs/notes/) says which version or commit it was checked against.
+
+Known incompatibilities and workarounds:
+
+- **Node.js on the host.** OpenDeck starts plugins with the system `node` and refuses anything older than 20.0.0. The
+  Flatpak build runs `flatpak-spawn --host node`, so Node.js must be installed on the host there too.
+- **Plugins cannot switch profiles.** OpenDeck drops `switchProfile` from every plugin except its Starter Pack. Use the
+  Starter Pack "Switch Profile" action and put plugin keys next to it.
+- **`titleParametersDidChange` reports the wrong row** (upstream computes `position / 3`). The plugins read
+  `payload.coordinates` from `willAppear` / `keyDown` instead.
+
 ## Development
 
 TypeScript on Node.js, bundled with esbuild, with a small shared library ([`packages/core`](packages/core)) for the
